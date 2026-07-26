@@ -15,9 +15,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AuthenticatedSpecialsRouteImport } from './routes/_authenticated.specials'
 import { Route as AuthenticatedShoppingListsRouteImport } from './routes/_authenticated.shopping-lists'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated.history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -49,6 +51,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/auth/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSpecialsRoute = AuthenticatedSpecialsRouteImport.update({
+  id: '/specials',
+  path: '/specials',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedShoppingListsRoute =
   AuthenticatedShoppingListsRouteImport.update({
     id: '/shopping-lists',
@@ -65,6 +72,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -75,9 +87,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shopping-lists': typeof AuthenticatedShoppingListsRoute
+  '/specials': typeof AuthenticatedSpecialsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -86,9 +100,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shopping-lists': typeof AuthenticatedShoppingListsRoute
+  '/specials': typeof AuthenticatedSpecialsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -99,9 +115,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/shopping-lists': typeof AuthenticatedShoppingListsRoute
+  '/_authenticated/specials': typeof AuthenticatedSpecialsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -112,9 +130,11 @@ export interface FileRouteTypes {
     | '/'
     | '/onboarding'
     | '/dashboard'
+    | '/history'
     | '/profile'
     | '/settings'
     | '/shopping-lists'
+    | '/specials'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -123,9 +143,11 @@ export interface FileRouteTypes {
     | '/'
     | '/onboarding'
     | '/dashboard'
+    | '/history'
     | '/profile'
     | '/settings'
     | '/shopping-lists'
+    | '/specials'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -135,9 +157,11 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/onboarding'
     | '/_authenticated/dashboard'
+    | '/_authenticated/history'
     | '/_authenticated/profile'
     | '/_authenticated/settings'
     | '/_authenticated/shopping-lists'
+    | '/_authenticated/specials'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -196,6 +220,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/specials': {
+      id: '/_authenticated/specials'
+      path: '/specials'
+      fullPath: '/specials'
+      preLoaderRoute: typeof AuthenticatedSpecialsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/shopping-lists': {
       id: '/_authenticated/shopping-lists'
       path: '/shopping-lists'
@@ -217,6 +248,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -229,16 +267,20 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedShoppingListsRoute: typeof AuthenticatedShoppingListsRoute
+  AuthenticatedSpecialsRoute: typeof AuthenticatedSpecialsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedShoppingListsRoute: AuthenticatedShoppingListsRoute,
+  AuthenticatedSpecialsRoute: AuthenticatedSpecialsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -256,3 +298,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
