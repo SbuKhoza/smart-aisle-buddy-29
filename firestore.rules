@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    match /users/{uid}    { allow read, write: if isOwner(uid); }
+    match /profiles/{uid} { allow read, write: if isOwner(uid); }
+    match /settings/{uid} { allow read, write: if isOwner(uid); }
+
+    match /shoppingLists/{docId} {
+      allow read, write: if signedIn() && request.resource.data.userId == request.auth.uid;
+    }
+    match /shoppingItems/{docId} { allow read, write: if signedIn(); }
+    match /shoppingHistory/{docId} {
+      allow read, write: if signedIn() && request.resource.data.userId == request.auth.uid;
+    }
+    match /notifications/{docId} {
+      allow read, write: if signedIn() && resource.data.userId == request.auth.uid;
+    }
+    match /crowdsourcedPrices/{docId} {
+      allow read:  if signedIn();
+      allow write: if signedIn() && request.resource.data.userId == request.auth.uid;
+    }
+    match /products/{docId}   { allow read: if signedIn(); allow write: if false; }
+    match /prices/{docId}     { allow read: if signedIn(); allow write: if false; }
+    match /stores/{docId}     { allow read: if signedIn(); allow write: if false; }
+    match /catalogues/{docId} { allow read: if signedIn(); allow write: if false; }
+    match /promotions/{docId} { allow read: if signedIn(); allow write: if false; }
+  }
+}

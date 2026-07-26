@@ -1,0 +1,14 @@
+{
+  "name": "AISLE SPY — Smart Shopping",
+  "short_name": "AISLE SPY",
+  "description": "Plan your groceries, track spending, and save money at every aisle.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "64x64 32x32 24x24 16x16", "type": "image/x-icon" }
+  ]
+}
