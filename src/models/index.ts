@@ -79,17 +79,30 @@ export interface ShoppingList {
   createdAt: ISODate;
   updatedAt: ISODate;
   archived: boolean;
+  status?: "active" | "shopping" | "completed" | "archived";
+  itemCount?: number;
+  estimatedTotal?: number;
+  actualTotal?: number;
+  budget?: number;
 }
 
 export interface ShoppingItem {
   id: ID;
   listId: ID;
+  userId?: ID;
   productId?: ID;
   name: string;
+  brand?: string;
+  category?: string;
   quantity: number;
   unit?: string;
   estimatedPrice?: number;
+  actualPrice?: number;
   purchased: boolean;
+  favourite?: boolean;
+  notes?: string;
+  order?: number;
+  createdAt?: ISODate;
 }
 
 export interface Promotion {
@@ -134,8 +147,40 @@ export interface ShoppingHistoryEntry {
   id: ID;
   userId: ID;
   listId?: ID;
+  name?: string;
   storeId?: ID;
+  storeName?: string;
   total: number;
+  estimatedTotal?: number;
+  actualTotal?: number;
+  budget?: number;
+  purchasedCount?: number;
   itemCount: number;
   completedAt: ISODate;
+  items?: ShoppingItem[];
+}
+
+export interface UserProduct {
+  id: ID;
+  userId: ID;
+  name: string;
+  brand?: string;
+  category: string;
+  defaultUnit: string;
+  defaultQuantity: number;
+  estimatedPrice: number;
+  imageURL?: string;
+  createdAt: ISODate;
+}
+
+export interface FavouriteProduct {
+  id: ID;
+  userId: ID;
+  productId: string;
+  name: string;
+  brand?: string;
+  category: string;
+  unit: string;
+  estimatedPrice: number;
+  addedAt: ISODate;
 }
