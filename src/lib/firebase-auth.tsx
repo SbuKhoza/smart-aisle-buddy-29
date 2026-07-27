@@ -5,39 +5,63 @@ import {
   useState,
   type ReactNode,
 } from "react";
+
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut as fbSignOut,
+  signOut,
   sendPasswordResetEmail,
   sendEmailVerification,
-  updateProfile as fbUpdateProfile,
+  updateProfile,
   signInWithPopup,
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
-  type User as FbUser,
+  type User,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { getFirebaseAuth, getDb, googleProvider } from "./firebase";
+
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+
+import {
+  getFirebaseAuth,
+  getDb,
+  googleProvider,
+} from "./firebase";
+
 import type { Profile } from "@/models";
 
 interface AuthContextValue {
   ready: boolean;
-  user: FbUser | null;
+  user: User | null;
   profile: Profile | null;
+
   register: (data: {
     firstName: string;
     lastName: string;
     email: string;
     password: string;
   }) => Promise<void>;
-  login: (email: string, password: string, remember: boolean) => Promise<void>;
+
+  login: (
+    email: string,
+    password: string,
+    remember: boolean
+  ) => Promise<void>;
+
   loginWithGoogle: () => Promise<void>;
+
   logout: () => Promise<void>;
+
   resetPassword: (email: string) => Promise<void>;
+
   refreshProfile: () => Promise<void>;
+
   saveProfile: (updates: Partial<Profile>) => Promise<void>;
 }
 
@@ -45,52 +69,90 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
+
+  if (!ctx) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+
   return ctx;
 }
 
-async function loadProfile(uid: string): Promise<Profile | null> {
-  const snap = await getDoc(doc(getDb(), "profiles", uid));
-  return snap.exists() ? (snap.data() as Profile) : null;
+async function loadProfile(uid: string): Promise<Profile |null> {
+  const ref = doc(getDb(), "profiles", uid);
+
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    console.warn("Profile not found:", uid);
+    return null;
+  }
+
+  return snap.data() as Profile;
 }
 
-async function ensureUserDoc(u: FbUser, firstName?: string, lastName?: string) {
+async function ensureUserDoc(
+  user: User,
+  firstName?: string,
+  lastName?: string
+) {
   const db = getDb();
-  const userRef = doc(db, "users", u.uid);
-  const existing = await getDoc(userRef);
-  const [fn, ...rest] = (u.displayName ?? "").split(" ");
-  if (!existing.exists()) {
+
+  const [displayFirst = "", ...rest] = (user.displayName ?? "").split(" ");
+
+  const first = firstName ?? displayFirst;
+  const last = lastName ?? rest.join(" ");
+
+  // USERS
+
+  const userRef = doc(db, "users", user.uid);
+
+  if (!(await getDoc(userRef)).exists()) {
     await setDoc(userRef, {
-      id: u.uid,
-      email: u.email,
-      firstName: firstName ?? fn ?? "",
-      lastName: lastName ?? rest.join(" ") ?? "",
-      emailVerified: u.emailVerified,
+      id: user.uid,
+      email: user.email,
+      firstName: first,
+      lastName: last,
+      emailVerified: user.emailVerified,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
+
+    console.log("Created users document");
   }
-  const profileRef = doc(db, "profiles", u.uid);
-  const profSnap = await getDoc(profileRef);
-  if (!profSnap.exists()) {
-    const initial: Profile = {
-      userId: u.uid,
-      firstName: firstName ?? fn ?? "",
-      lastName: lastName ?? rest.join(" ") ?? "",
-      photoURL: u.photoURL ?? undefined,
+
+  // PROFILE
+
+  const profileRef = doc(db, "profiles", user.uid);
+
+  if (!(await getDoc(profileRef)).exists()) {
+    const profile: Profile = {
+      userId: user.uid,
+      firstName: first,
+      lastName: last,
+      photoURL: user.photoURL ?? undefined,
+
       country: "ZA",
       favouriteStores: [],
+
       onboardingComplete: false,
+
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    await setDoc(profileRef, initial);
+
+    await setDoc(profileRef, profile);
+
+    console.log("Created profile");
   }
-  const settingsRef = doc(db, "settings", u.uid);
-  const settingsSnap = await getDoc(settingsRef);
-  if (!settingsSnap.exists()) {
+
+  // SETTINGS
+
+  const settingsRef = doc(db, "settings", user.uid);
+
+  if (!(await getDoc(settingsRef)).exists()) {
     await setDoc(settingsRef, {
-      userId: u.uid,
+      userId: user.uid,
+
       notifications: {
         promotions: true,
         priceDrops: true,
@@ -98,94 +160,211 @@ async function ensureUserDoc(u: FbUser, firstName?: string, lastName?: string) {
         push: true,
         email: true,
       },
-      location: { enabled: false },
-      privacy: { analytics: true, crashReports: true, shareUsage: false },
+
+      location: {
+        enabled: false,
+      },
+
+      privacy: {
+        analytics: true,
+        crashReports: true,
+        shareUsage: false,
+      },
+
       theme: "system",
       language: "en",
     });
+
+    console.log("Created settings");
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [ready, setReady] = useState(false);
-  const [user, setUser] = useState<FbUser | null>(null);
+
+  const [user, setUser] = useState<User | null>(null);
+
   const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
     const auth = getFirebaseAuth();
-    const unsub = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (u) {
-        try {
-          await ensureUserDoc(u);
-          setProfile(await loadProfile(u.uid));
-        } catch (err) {
-          console.error("[auth] profile hydrate failed", err);
-        }
-      } else {
+
+    return onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
+
+      if (!firebaseUser) {
         setProfile(null);
+        setReady(true);
+        return;
       }
+
+      try {
+        await ensureUserDoc(firebaseUser);
+
+        const p = await loadProfile(firebaseUser.uid);
+
+        setProfile(p);
+      } catch (err) {
+        console.error("Profile hydration failed", err);
+      }
+
       setReady(true);
     });
-    return () => unsub();
   }, []);
 
-  const refreshProfile = async () => {
+  async function refreshProfile() {
     if (!user) return;
-    setProfile(await loadProfile(user.uid));
-  };
 
-  const value: AuthContextValue = {
-    ready,
-    user,
-    profile,
-    refreshProfile,
-    async register({ firstName, lastName, email, password }) {
-      const auth = getFirebaseAuth();
-      await setPersistence(auth, browserLocalPersistence);
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await fbUpdateProfile(cred.user, { displayName: `${firstName} ${lastName}` });
-      await ensureUserDoc(cred.user, firstName, lastName);
-      try {
-        await sendEmailVerification(cred.user);
-      } catch (err) {
-        console.warn("[auth] verification email failed", err);
-      }
-      setProfile(await loadProfile(cred.user.uid));
-    },
-    async login(email, password, remember) {
-      const auth = getFirebaseAuth();
-      await setPersistence(
-        auth,
-        remember ? browserLocalPersistence : browserSessionPersistence,
-      );
-      await signInWithEmailAndPassword(auth, email, password);
-    },
-    async loginWithGoogle() {
-      const auth = getFirebaseAuth();
-      await setPersistence(auth, browserLocalPersistence);
-      const cred = await signInWithPopup(auth, googleProvider);
-      await ensureUserDoc(cred.user);
-    },
-    async logout() {
-      await fbSignOut(getFirebaseAuth());
-    },
-    async resetPassword(email) {
-      await sendPasswordResetEmail(getFirebaseAuth(), email);
-    },
-    async saveProfile(updates) {
-      if (!user) throw new Error("Not signed in");
-      const ref = doc(getDb(), "profiles", user.uid);
-      const merged: Profile = {
-        ...(profile as Profile),
-        ...updates,
-        userId: user.uid,
-        updatedAt: new Date().toISOString(),
-      };
-      await setDoc(ref, merged, { merge: true });
-      setProfile(merged);
-    },
-  };
+    const p = await loadProfile(user.uid);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    setProfile(p);
+  }
+
+  async function register({
+    firstName,
+    lastName,
+    email,
+    password,
+  }: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }) {
+    const auth = getFirebaseAuth();
+
+    await setPersistence(auth, browserLocalPersistence);
+
+    const cred = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    await updateProfile(cred.user, {
+      displayName: `${firstName} ${lastName}`,
+    });
+
+    await ensureUserDoc(
+      cred.user,
+      firstName,
+      lastName
+    );
+
+    try {
+      await sendEmailVerification(cred.user);
+    } catch (e) {
+      console.warn(e);
+    }
+
+    const p = await loadProfile(cred.user.uid);
+
+    setUser(cred.user);
+    setProfile(p);
+  }
+
+  async function login(
+    email: string,
+    password: string,
+    remember: boolean
+  ) {
+    const auth = getFirebaseAuth();
+
+    await setPersistence(
+      auth,
+      remember
+        ? browserLocalPersistence
+        : browserSessionPersistence
+    );
+
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+  }
+
+  async function loginWithGoogle() {
+    const auth = getFirebaseAuth();
+
+    await setPersistence(
+      auth,
+      browserLocalPersistence
+    );
+
+    const cred = await signInWithPopup(
+      auth,
+      googleProvider
+    );
+
+    await ensureUserDoc(cred.user);
+
+    const p = await loadProfile(cred.user.uid);
+
+    setUser(cred.user);
+    setProfile(p);
+  }
+
+  async function logout() {
+    await signOut(getFirebaseAuth());
+  }
+
+  async function resetPassword(email: string) {
+    await sendPasswordResetEmail(
+      getFirebaseAuth(),
+      email
+    );
+  }
+
+  async function saveProfile(
+    updates: Partial<Profile>
+  ) {
+    if (!user) {
+      throw new Error("Not signed in");
+    }
+
+    const ref = doc(
+      getDb(),
+      "profiles",
+      user.uid
+    );
+
+    const merged: Profile = {
+      ...(profile as Profile),
+      ...updates,
+
+      userId: user.uid,
+
+      updatedAt: new Date().toISOString(),
+    };
+
+    await setDoc(ref, merged, {
+      merge: true,
+    });
+
+    setProfile(merged);
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        ready,
+        user,
+        profile,
+        register,
+        login,
+        loginWithGoogle,
+        logout,
+        resetPassword,
+        refreshProfile,
+        saveProfile,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
