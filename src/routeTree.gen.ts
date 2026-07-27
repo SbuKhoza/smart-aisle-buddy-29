@@ -21,6 +21,11 @@ import { Route as AuthenticatedSpecialsRouteImport } from './routes/_authenticat
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
+import { Route as AuthenticatedHistoryIndexRouteImport } from './routes/_authenticated.history.index'
+import { Route as AuthenticatedHistoryTripIdRouteImport } from './routes/_authenticated.history.$tripId'
+import { Route as AuthenticatedShoppingListsIndexRouteImport } from './routes/_authenticated.shopping-lists.index'
+import { Route as AuthenticatedShoppingListsListIdRouteImport } from './routes/_authenticated.shopping-lists.$listId'
+import { Route as AuthenticatedShoppingListsListIdShopRouteImport } from './routes/_authenticated.shopping-lists.$listId.shop'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,32 +87,70 @@ const AuthRegisterRoute = AuthRegisterRouteImport.update({
   path: '/auth/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedHistoryIndexRoute =
+  AuthenticatedHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedHistoryRoute,
+  } as any)
+const AuthenticatedHistoryTripIdRoute =
+  AuthenticatedHistoryTripIdRouteImport.update({
+    id: '/$tripId',
+    path: '/$tripId',
+    getParentRoute: () => AuthenticatedHistoryRoute,
+  } as any)
+const AuthenticatedShoppingListsIndexRoute =
+  AuthenticatedShoppingListsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedShoppingListsRoute,
+  } as any)
+const AuthenticatedShoppingListsListIdRoute =
+  AuthenticatedShoppingListsListIdRouteImport.update({
+    id: '/$listId',
+    path: '/$listId',
+    getParentRoute: () => AuthenticatedShoppingListsRoute,
+  } as any)
+const AuthenticatedShoppingListsListIdShopRoute =
+  AuthenticatedShoppingListsListIdShopRouteImport.update({
+    id: '/shop',
+    path: '/shop',
+    getParentRoute: () => AuthenticatedShoppingListsListIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/history': typeof AuthenticatedHistoryRoute
+  '/history': typeof AuthenticatedHistoryRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/shopping-lists': typeof AuthenticatedShoppingListsRoute
+  '/shopping-lists': typeof AuthenticatedShoppingListsRouteWithChildren
   '/specials': typeof AuthenticatedSpecialsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
+  '/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
+  '/history/': typeof AuthenticatedHistoryIndexRoute
+  '/shopping-lists/': typeof AuthenticatedShoppingListsIndexRoute
+  '/shopping-lists/$listId/shop': typeof AuthenticatedShoppingListsListIdShopRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/history': typeof AuthenticatedHistoryRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/shopping-lists': typeof AuthenticatedShoppingListsRoute
   '/specials': typeof AuthenticatedSpecialsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
+  '/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
+  '/history': typeof AuthenticatedHistoryIndexRoute
+  '/shopping-lists': typeof AuthenticatedShoppingListsIndexRoute
+  '/shopping-lists/$listId/shop': typeof AuthenticatedShoppingListsListIdShopRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,14 +158,19 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
-  '/_authenticated/shopping-lists': typeof AuthenticatedShoppingListsRoute
+  '/_authenticated/shopping-lists': typeof AuthenticatedShoppingListsRouteWithChildren
   '/_authenticated/specials': typeof AuthenticatedSpecialsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/_authenticated/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
+  '/_authenticated/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
+  '/_authenticated/history/': typeof AuthenticatedHistoryIndexRoute
+  '/_authenticated/shopping-lists/': typeof AuthenticatedShoppingListsIndexRoute
+  '/_authenticated/shopping-lists/$listId/shop': typeof AuthenticatedShoppingListsListIdShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -138,19 +186,27 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
+    | '/history/$tripId'
+    | '/shopping-lists/$listId'
+    | '/history/'
+    | '/shopping-lists/'
+    | '/shopping-lists/$listId/shop'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/onboarding'
     | '/dashboard'
-    | '/history'
     | '/profile'
     | '/settings'
-    | '/shopping-lists'
     | '/specials'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
+    | '/history/$tripId'
+    | '/shopping-lists/$listId'
+    | '/history'
+    | '/shopping-lists'
+    | '/shopping-lists/$listId/shop'
   id:
     | '__root__'
     | '/'
@@ -165,6 +221,11 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
+    | '/_authenticated/history/$tripId'
+    | '/_authenticated/shopping-lists/$listId'
+    | '/_authenticated/history/'
+    | '/_authenticated/shopping-lists/'
+    | '/_authenticated/shopping-lists/$listId/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -262,24 +323,104 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/history/': {
+      id: '/_authenticated/history/'
+      path: '/'
+      fullPath: '/history/'
+      preLoaderRoute: typeof AuthenticatedHistoryIndexRouteImport
+      parentRoute: typeof AuthenticatedHistoryRoute
+    }
+    '/_authenticated/history/$tripId': {
+      id: '/_authenticated/history/$tripId'
+      path: '/$tripId'
+      fullPath: '/history/$tripId'
+      preLoaderRoute: typeof AuthenticatedHistoryTripIdRouteImport
+      parentRoute: typeof AuthenticatedHistoryRoute
+    }
+    '/_authenticated/shopping-lists/': {
+      id: '/_authenticated/shopping-lists/'
+      path: '/'
+      fullPath: '/shopping-lists/'
+      preLoaderRoute: typeof AuthenticatedShoppingListsIndexRouteImport
+      parentRoute: typeof AuthenticatedShoppingListsRoute
+    }
+    '/_authenticated/shopping-lists/$listId': {
+      id: '/_authenticated/shopping-lists/$listId'
+      path: '/$listId'
+      fullPath: '/shopping-lists/$listId'
+      preLoaderRoute: typeof AuthenticatedShoppingListsListIdRouteImport
+      parentRoute: typeof AuthenticatedShoppingListsRoute
+    }
+    '/_authenticated/shopping-lists/$listId/shop': {
+      id: '/_authenticated/shopping-lists/$listId/shop'
+      path: '/shop'
+      fullPath: '/shopping-lists/$listId/shop'
+      preLoaderRoute: typeof AuthenticatedShoppingListsListIdShopRouteImport
+      parentRoute: typeof AuthenticatedShoppingListsListIdRoute
+    }
   }
 }
 
+interface AuthenticatedHistoryRouteChildren {
+  AuthenticatedHistoryTripIdRoute: typeof AuthenticatedHistoryTripIdRoute
+  AuthenticatedHistoryIndexRoute: typeof AuthenticatedHistoryIndexRoute
+}
+
+const AuthenticatedHistoryRouteChildren: AuthenticatedHistoryRouteChildren = {
+  AuthenticatedHistoryTripIdRoute: AuthenticatedHistoryTripIdRoute,
+  AuthenticatedHistoryIndexRoute: AuthenticatedHistoryIndexRoute,
+}
+
+const AuthenticatedHistoryRouteWithChildren =
+  AuthenticatedHistoryRoute._addFileChildren(AuthenticatedHistoryRouteChildren)
+
+interface AuthenticatedShoppingListsListIdRouteChildren {
+  AuthenticatedShoppingListsListIdShopRoute: typeof AuthenticatedShoppingListsListIdShopRoute
+}
+
+const AuthenticatedShoppingListsListIdRouteChildren: AuthenticatedShoppingListsListIdRouteChildren =
+  {
+    AuthenticatedShoppingListsListIdShopRoute:
+      AuthenticatedShoppingListsListIdShopRoute,
+  }
+
+const AuthenticatedShoppingListsListIdRouteWithChildren =
+  AuthenticatedShoppingListsListIdRoute._addFileChildren(
+    AuthenticatedShoppingListsListIdRouteChildren,
+  )
+
+interface AuthenticatedShoppingListsRouteChildren {
+  AuthenticatedShoppingListsListIdRoute: typeof AuthenticatedShoppingListsListIdRouteWithChildren
+  AuthenticatedShoppingListsIndexRoute: typeof AuthenticatedShoppingListsIndexRoute
+}
+
+const AuthenticatedShoppingListsRouteChildren: AuthenticatedShoppingListsRouteChildren =
+  {
+    AuthenticatedShoppingListsListIdRoute:
+      AuthenticatedShoppingListsListIdRouteWithChildren,
+    AuthenticatedShoppingListsIndexRoute: AuthenticatedShoppingListsIndexRoute,
+  }
+
+const AuthenticatedShoppingListsRouteWithChildren =
+  AuthenticatedShoppingListsRoute._addFileChildren(
+    AuthenticatedShoppingListsRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-  AuthenticatedShoppingListsRoute: typeof AuthenticatedShoppingListsRoute
+  AuthenticatedShoppingListsRoute: typeof AuthenticatedShoppingListsRouteWithChildren
   AuthenticatedSpecialsRoute: typeof AuthenticatedSpecialsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
-  AuthenticatedShoppingListsRoute: AuthenticatedShoppingListsRoute,
+  AuthenticatedShoppingListsRoute: AuthenticatedShoppingListsRouteWithChildren,
   AuthenticatedSpecialsRoute: AuthenticatedSpecialsRoute,
 }
 
@@ -298,13 +439,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
