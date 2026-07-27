@@ -149,8 +149,8 @@ export interface NewItemInput {
   category?: string;
   productId?: string;
   quantity: number;
-  unit: string;
-  estimatedPrice: number;
+  unit?: string;
+  estimatedPrice?: number;
   notes?: string;
 }
 
