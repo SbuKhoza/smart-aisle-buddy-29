@@ -420,24 +420,59 @@ export const userProductService = {
     cb: (products: UserProduct[]) => void,
     onError?: (e: Error) => void,
   ): Unsubscribe {
-    const q = query(collection(getDb(), USER_PRODUCTS), where("userId", "==", userId));
+    const q = query(
+      collection(getDb(), USER_PRODUCTS),
+      where("userId", "==", userId)
+    );
+
     return onSnapshot(
       q,
       (snap) => {
-        const rows = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as UserProduct[];
-        rows.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+        const rows = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as any),
+        })) as UserProduct[];
+
+        rows.sort((a, b) =>
+          (b.createdAt || "").localeCompare(a.createdAt || "")
+        );
+
         cb(rows);
       },
-      (err) => onError?.(err),
+      (err) => onError?.(err)
     );
   },
 
-  async create(userId: string, input: Omit<UserProduct, "id" | "userId" | "createdAt">): Promise<string> {
-    const ref = await addDoc(collection(getDb(), USER_PRODUCTS), {
-      ...input,
+  async create(
+    userId: string,
+    input: Omit<UserProduct, "id" | "userId" | "createdAt">
+  ): Promise<string> {
+
+    const data = {
       userId,
+
+      name: input.name.trim(),
+
+      brand: input.brand ?? null,
+
+      category: input.category,
+
+      defaultUnit: input.defaultUnit,
+
+      defaultQuantity: Number(input.defaultQuantity) || 1,
+
+      estimatedPrice: Number(input.estimatedPrice) || 0,
+
+      imageURL: input.imageURL ?? null,
+
       createdAt: nowIso(),
-    });
+    };
+
+    const ref = await addDoc(
+      collection(getDb(), USER_PRODUCTS),
+      data
+    );
+
     return ref.id;
   },
 
