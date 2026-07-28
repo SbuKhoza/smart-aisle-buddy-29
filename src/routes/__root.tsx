@@ -92,12 +92,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "AISLE SPY — Smart Shopping" },
       {
         property: "og:description",
-        content: "Plan smarter, shop faster, spend less.",
+        content: "AISLE SPY helps you plan groceries, track spending, and save on every aisle.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "AISLE SPY — Smart Shopping" },
-      { name: "twitter:description", content: "Plan smarter, shop faster, spend less." },
+      { name: "twitter:description", content: "AISLE SPY helps you plan groceries, track spending, and save on every aisle." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6d017930-b675-424d-b435-01b50f2f60df/id-preview-fc76d0a3--31d677dd-bdbf-4ff6-b33a-d7a462a6b6b5.lovable.app-1785156616237.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6d017930-b675-424d-b435-01b50f2f60df/id-preview-fc76d0a3--31d677dd-bdbf-4ff6-b33a-d7a462a6b6b5.lovable.app-1785156616237.png" },
     ],
     links: [
       {
