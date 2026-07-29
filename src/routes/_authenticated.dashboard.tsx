@@ -7,7 +7,7 @@ import { historyService, shoppingListService } from "@/lib/services/shopping";
 import type { ShoppingHistoryEntry, ShoppingList } from "@/models";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreateListDialog } from "@/components/shopping/CreateListDialog";
+import { CreateListDialog, type CreateListInput } from "@/components/shopping/CreateListDialog";
 import { AnimatedTotal } from "@/components/shopping/AnimatedTotal";
 import { toast } from "sonner";
 
@@ -59,9 +59,13 @@ function Dashboard() {
   const inProgress = lists.find((l) => l.status === "shopping");
   const lastTrip = trips[0];
 
-  async function createList(name: string) {
+  async function createList(input: CreateListInput) {
     if (!user) return;
-    const id = await shoppingListService.create(user.uid, name);
+    const id = await shoppingListService.create(user.uid, input.name, {
+      storeId: input.storeId,
+      storeName: input.storeName,
+      mode: input.mode,
+    });
     toast.success("List created");
     navigate({ to: "/shopping-lists/$listId", params: { listId: id } });
   }

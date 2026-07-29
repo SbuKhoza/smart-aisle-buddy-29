@@ -58,7 +58,16 @@ export const shoppingListService = {
     return snap.exists() ? ({ id: snap.id, ...(snap.data() as any) } as ShoppingList) : null;
   },
 
-  async create(userId: string, name: string, budget?: number): Promise<string> {
+  async create(
+    userId: string,
+    name: string,
+    opts?: {
+      budget?: number;
+      storeId?: string;
+      storeName?: string;
+      mode?: "custom" | "store" | "combination";
+    },
+  ): Promise<string> {
     const ref = await addDoc(collection(getDb(), LISTS), {
       userId,
       name: name.trim(),
@@ -67,7 +76,10 @@ export const shoppingListService = {
       itemCount: 0,
       estimatedTotal: 0,
       actualTotal: 0,
-      budget: budget ?? null,
+      budget: opts?.budget ?? null,
+      storeId: opts?.storeId ?? null,
+      storeName: opts?.storeName ?? null,
+      mode: opts?.mode ?? "custom",
       createdAt: nowIso(),
       updatedAt: nowIso(),
     });
@@ -112,7 +124,12 @@ export const shoppingListService = {
   async duplicate(userId: string, sourceId: string, newName?: string): Promise<string> {
     const src = await this.get(sourceId);
     if (!src) throw new Error("List not found");
-    const newId = await this.create(userId, newName || `${src.name} (Copy)`, src.budget);
+    const newId = await this.create(userId, newName || `${src.name} (Copy)`, {
+      budget: src.budget,
+      storeId: src.storeId,
+      storeName: src.storeName,
+      mode: src.mode,
+    });
     const items = await shoppingItemService.listOnce(userId, sourceId);
     await shoppingItemService.bulkAdd(
       userId,
@@ -333,7 +350,9 @@ export const historyService = {
     const trip = await this.get(tripId);
     if (!trip) throw new Error("Trip not found");
     const name = trip.name || "Shopping trip";
-    const newListId = await shoppingListService.create(userId, `${name} (Reused)`, trip.budget || undefined);
+    const newListId = await shoppingListService.create(userId, `${name} (Reused)`, {
+      budget: trip.budget || undefined,
+    });
     if (trip.items?.length) {
       await shoppingItemService.bulkAdd(
         userId,

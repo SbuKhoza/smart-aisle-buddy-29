@@ -122,7 +122,12 @@ function ShopModePage() {
                 mode="shop"
                 onToggle={() => shoppingItemService.togglePurchased(item.id, !item.purchased)}
                 onDelete={() => setDeletingItem(item.id)}
-                onActualPriceChange={(v) => shoppingItemService.setActualPrice(item.id, v)}
+                onActualPriceChange={(v) => {
+                  shoppingItemService.setActualPrice(item.id, v);
+                  const shouldMark = v !== null && v > 0;
+                  if (shouldMark && !item.purchased) shoppingItemService.togglePurchased(item.id, true);
+                  if (!shouldMark && item.purchased) shoppingItemService.togglePurchased(item.id, false);
+                }}
               />
             ))}
           </AnimatePresence>
