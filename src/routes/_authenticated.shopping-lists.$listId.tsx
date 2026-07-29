@@ -237,15 +237,28 @@ function ListDetailPage() {
 
       <Card className="mb-4 rounded-3xl border-border p-4">
         <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Add products</p>
-        <ProductSearch
+        <QuickAddBar
           userProducts={userProducts}
           favourites={favs}
           recentNames={recentNames}
-          favouriteIds={favouriteIds}
-          onPick={addFromResult}
-          onCreateCustom={(n) => { setCustomInitial(n); setCustomOpen(true); }}
+          onAdd={addQuick}
+          onAddFreeText={addFreeText}
         />
       </Card>
+
+      {(list.mode === "store" || list.mode === "combination") && (
+        <div className="mb-4">
+          <StoreCatalog
+            storeName={list.storeName}
+            quantitiesByProductId={Object.fromEntries(
+              items.filter((i) => i.productId).map((i) => [i.productId as string, Number(i.quantity) || 0]),
+            )}
+            onIncrement={incrementProduct}
+            onDecrement={decrementProduct}
+            defaultOpen={items.length === 0}
+          />
+        </div>
+      )}
 
       <div className="mb-3">
         <CategoryFilter value={category} onChange={setCategory} />
@@ -270,6 +283,7 @@ function ListDetailPage() {
                 onDelete={() => setDeletingItem(item)}
                 onEdit={() => setEditing(item)}
                 onFavourite={() => toggleFavourite(item)}
+                onQuantityChange={(q) => shoppingItemService.update(item.id, { quantity: q })}
               />
             ))}
           </AnimatePresence>
@@ -296,7 +310,6 @@ function ListDetailPage() {
         </div>
       )}
 
-      <CustomProductDialog open={customOpen} onOpenChange={setCustomOpen} initialName={customInitial} onSubmit={addCustom} />
       <EditItemDialog item={editing} open={!!editing} onOpenChange={(v) => !v && setEditing(null)}
         onSave={async (patch) => { if (editing) { await shoppingItemService.update(editing.id, patch); toast.success("Updated"); } }} />
       <ConfirmDialog open={!!deletingItem} onOpenChange={(v) => !v && setDeletingItem(null)}
