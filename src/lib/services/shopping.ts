@@ -350,7 +350,9 @@ export const historyService = {
     const trip = await this.get(tripId);
     if (!trip) throw new Error("Trip not found");
     const name = trip.name || "Shopping trip";
-    const newListId = await shoppingListService.create(userId, `${name} (Reused)`, trip.budget || undefined);
+    const newListId = await shoppingListService.create(userId, `${name} (Reused)`, {
+      budget: trip.budget || undefined,
+    });
     if (trip.items?.length) {
       await shoppingItemService.bulkAdd(
         userId,
