@@ -76,6 +76,8 @@ export interface ShoppingList {
   userId: ID;
   name: string;
   storeId?: ID;
+  storeName?: string;
+  mode?: "custom" | "store" | "combination";
   createdAt: ISODate;
   updatedAt: ISODate;
   archived: boolean;

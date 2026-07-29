@@ -25,8 +25,9 @@ import { ItemRow } from "@/components/shopping/ItemRow";
 import { BudgetCard } from "@/components/shopping/BudgetCard";
 import { AnimatedTotal } from "@/components/shopping/AnimatedTotal";
 import { CategoryFilter } from "@/components/shopping/CategoryChip";
-import { ProductSearch, type SearchResult } from "@/components/shopping/ProductSearch";
-import { CustomProductDialog, type CustomProductValue } from "@/components/shopping/CustomProductDialog";
+import { QuickAddBar, type QuickAddItem } from "@/components/shopping/QuickAddBar";
+import { StoreCatalog } from "@/components/shopping/StoreCatalog";
+import type { PreloadedProduct } from "@/data/preloaded-products";
 import { EditItemDialog } from "@/components/shopping/EditItemDialog";
 import { ConfirmDialog } from "@/components/shopping/ConfirmDialog";
 import { EmptyState } from "@/components/EmptyState";
@@ -50,8 +51,6 @@ function ListDetailPage() {
   const [userProducts, setUserProducts] = useState<UserProduct[]>([]);
   const [favs, setFavs] = useState<FavouriteProduct[]>([]);
   const [category, setCategory] = useState<CategoryId | "all">("all");
-  const [customOpen, setCustomOpen] = useState(false);
-  const [customInitial, setCustomInitial] = useState("");
   const [editing, setEditing] = useState<ShoppingItem | null>(null);
   const [deletingItem, setDeletingItem] = useState<ShoppingItem | null>(null);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -70,7 +69,7 @@ function ListDetailPage() {
   const favouriteIds = useMemo(() => new Set(favs.map((f) => f.productId)), [favs]);
   const filteredItems = useMemo(() => (category === "all" ? items : items.filter((i) => (i.category || "other") === category)), [items, category]);
 
-  async function addFromResult(r: SearchResult) {
+  async function addQuick(r: QuickAddItem) {
     if (!user || !listId) return;
     const existing = items.find(
       (i) => (r.productId && i.productId === r.productId) || i.name.toLowerCase() === r.name.toLowerCase(),
@@ -94,20 +93,46 @@ function ListDetailPage() {
     toast.success(`Added ${r.name}`);
   }
 
-  async function addCustom(v: CustomProductValue) {
+  async function addFreeText(name: string) {
     if (!user || !listId) return;
-    let productId: string | undefined;
-    if (v.savePersonal) {
-      productId = await userProductService.create(user.uid, {
-        name: v.name, brand: v.brand, category: v.category,
-        defaultUnit: v.unit, defaultQuantity: v.quantity, estimatedPrice: v.estimatedPrice,
-      });
+    const trimmed = name.trim();
+    const existing = items.find((i) => i.name.toLowerCase() === trimmed.toLowerCase());
+    if (existing) {
+      const next = (Number(existing.quantity) || 0) + 1;
+      await shoppingItemService.update(existing.id, { quantity: next });
+      toast.success(`Increased ${existing.name} to ${next}`);
+      return;
     }
     await shoppingItemService.add(user.uid, listId, {
-      productId, name: v.name, brand: v.brand, category: v.category,
-      quantity: v.quantity, unit: v.unit, estimatedPrice: v.estimatedPrice,
+      name: trimmed,
+      category: "other",
+      quantity: 1,
+      unit: "pcs",
+      estimatedPrice: 0,
     });
-    toast.success(`Added ${v.name}`);
+    toast.success(`Added ${trimmed}`);
+  }
+
+  async function incrementProduct(p: PreloadedProduct) {
+    await addQuick({
+      productId: p.id,
+      name: p.name,
+      category: p.category,
+      quantity: p.quantity,
+      unit: p.unit,
+      estimatedPrice: p.estimatedPrice,
+    });
+  }
+
+  async function decrementProduct(productId: string) {
+    const existing = items.find((i) => i.productId === productId);
+    if (!existing) return;
+    const next = (Number(existing.quantity) || 0) - 1;
+    if (next <= 0) {
+      await shoppingItemService.remove(existing.id);
+    } else {
+      await shoppingItemService.update(existing.id, { quantity: next });
+    }
   }
 
   async function toggleFavourite(item: ShoppingItem) {
@@ -212,15 +237,28 @@ function ListDetailPage() {
 
       <Card className="mb-4 rounded-3xl border-border p-4">
         <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Add products</p>
-        <ProductSearch
+        <QuickAddBar
           userProducts={userProducts}
           favourites={favs}
           recentNames={recentNames}
-          favouriteIds={favouriteIds}
-          onPick={addFromResult}
-          onCreateCustom={(n) => { setCustomInitial(n); setCustomOpen(true); }}
+          onAdd={addQuick}
+          onAddFreeText={addFreeText}
         />
       </Card>
+
+      {(list.mode === "store" || list.mode === "combination") && (
+        <div className="mb-4">
+          <StoreCatalog
+            storeName={list.storeName}
+            quantitiesByProductId={Object.fromEntries(
+              items.filter((i) => i.productId).map((i) => [i.productId as string, Number(i.quantity) || 0]),
+            )}
+            onIncrement={incrementProduct}
+            onDecrement={decrementProduct}
+            defaultOpen={items.length === 0}
+          />
+        </div>
+      )}
 
       <div className="mb-3">
         <CategoryFilter value={category} onChange={setCategory} />
@@ -245,6 +283,7 @@ function ListDetailPage() {
                 onDelete={() => setDeletingItem(item)}
                 onEdit={() => setEditing(item)}
                 onFavourite={() => toggleFavourite(item)}
+                onQuantityChange={(q) => shoppingItemService.update(item.id, { quantity: q })}
               />
             ))}
           </AnimatePresence>
@@ -271,7 +310,6 @@ function ListDetailPage() {
         </div>
       )}
 
-      <CustomProductDialog open={customOpen} onOpenChange={setCustomOpen} initialName={customInitial} onSubmit={addCustom} />
       <EditItemDialog item={editing} open={!!editing} onOpenChange={(v) => !v && setEditing(null)}
         onSave={async (patch) => { if (editing) { await shoppingItemService.update(editing.id, patch); toast.success("Updated"); } }} />
       <ConfirmDialog open={!!deletingItem} onOpenChange={(v) => !v && setDeletingItem(null)}

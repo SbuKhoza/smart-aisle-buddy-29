@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShoppingListCard } from "@/components/shopping/ShoppingListCard";
-import { CreateListDialog } from "@/components/shopping/CreateListDialog";
+import { CreateListDialog, type CreateListInput } from "@/components/shopping/CreateListDialog";
 import { ConfirmDialog } from "@/components/shopping/ConfirmDialog";
 import { FloatingAddButton } from "@/components/shopping/FloatingAddButton";
 import { EmptyState } from "@/components/EmptyState";
@@ -56,9 +56,13 @@ function ShoppingListsPage() {
     return rows;
   }, [lists, query, tab, sort]);
 
-  async function handleCreate(name: string) {
+  async function handleCreate(input: CreateListInput) {
     if (!user) return;
-    const id = await shoppingListService.create(user.uid, name);
+    const id = await shoppingListService.create(user.uid, input.name, {
+      storeId: input.storeId,
+      storeName: input.storeName,
+      mode: input.mode,
+    });
     toast.success("List created");
     navigate({ to: "/shopping-lists/$listId", params: { listId: id } });
   }
