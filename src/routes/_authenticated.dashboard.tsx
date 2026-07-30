@@ -198,9 +198,9 @@ rounded-3xl
 border
 border-white/10
 bg-gradient-to-br
-from-slate-800
-via-slate-900
-to-slate-800
+from-[#1F2A37]
+via-[#16202B]
+to-[#0F172A]
 px-6
 py-5
 text-left
@@ -209,9 +209,17 @@ sm:w-[calc(100%-2rem)]
 "
               >
 
-                <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-green-400/10 blur-3xl" />
+                {/* Background gradient overlay */}
+<div className="absolute inset-0 bg-gradient-to-r from-white/5 via-transparent to-transparent" />
 
-<div className="absolute bottom-0 left-8 h-32 w-24 rounded-full bg-yellow-300/10 blur-2xl" />
+{/* Green glow */}
+<div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-emerald-400/20 blur-3xl" />
+
+{/* Yellow glow */}
+<div className="absolute bottom-0 left-10 h-40 w-40 rounded-full bg-yellow-300/15 blur-3xl" />
+
+{/* Blue glow */}
+<div className="absolute left-1/2 top-0 h-40 w-40 rounded-full bg-sky-400/10 blur-3xl" />
 
                 <div
                   className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xs font-bold"
@@ -298,6 +306,14 @@ sm:w-[calc(100%-2rem)]
                 onClick={() => setSelectedStore(s.id)}
                 className="flex shrink-0 flex-col items-center gap-1"
               >
+                <div
+    className="absolute inset-0 opacity-[0.03]"
+    style={{
+        backgroundImage:
+            "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+        backgroundSize: "24px 24px",
+    }}
+/>
                 <div
                   className={cn(
                     "flex h-11 w-11 items-center justify-center rounded-full text-[11px] font-bold transition-all",
