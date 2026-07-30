@@ -167,7 +167,7 @@ export interface NewItemInput {
   productId?: string;
   quantity: number;
   unit?: string;
-  estimatedPrice?: number;
+  estimatedPrice?: number | null;
   notes?: string;
 }
 
@@ -217,7 +217,10 @@ export const shoppingItemService = {
       category: input.category ?? "other",
       quantity: Math.max(0.001, Number(input.quantity) || 1),
       unit: input.unit || "pcs",
-      estimatedPrice: Math.max(0, Number(input.estimatedPrice) || 0),
+      estimatedPrice:
+        input.estimatedPrice == null || Number.isNaN(Number(input.estimatedPrice))
+          ? null
+          : Math.max(0, Number(input.estimatedPrice)),
       actualPrice: null,
       purchased: false,
       notes: input.notes ?? null,
@@ -241,7 +244,10 @@ export const shoppingItemService = {
         category: input.category ?? "other",
         quantity: Math.max(0.001, Number(input.quantity) || 1),
         unit: input.unit || "pcs",
-        estimatedPrice: Math.max(0, Number(input.estimatedPrice) || 0),
+        estimatedPrice:
+        input.estimatedPrice == null || Number.isNaN(Number(input.estimatedPrice))
+          ? null
+          : Math.max(0, Number(input.estimatedPrice)),
         actualPrice: null,
         purchased: false,
         notes: input.notes ?? null,

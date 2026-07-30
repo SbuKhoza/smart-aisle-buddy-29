@@ -98,8 +98,8 @@ export interface ShoppingItem {
   category?: string;
   quantity: number;
   unit?: string;
-  estimatedPrice?: number;
-  actualPrice?: number;
+  estimatedPrice?: number | null;
+  actualPrice?: number | null;
   purchased: boolean;
   favourite?: boolean;
   notes?: string;
