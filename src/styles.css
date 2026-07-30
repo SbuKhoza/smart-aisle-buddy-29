@@ -4,20 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -34,6 +20,8 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-foreground: var(--primary-soft-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -42,6 +30,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -63,33 +53,84 @@
 
 :root {
   --radius: 0.625rem;
-  /* AISLE SPY brand tokens */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.22 0.02 250);
+
+  /* ===== AISLE SPY — premium grocery light theme ===== */
+
+  /* App canvas: #F7F8FA */
+  --background: oklch(0.984 0.003 247.858);
+  /* Dark text: #1F2937 */
+  --foreground: oklch(0.278 0.033 256.848);
+
+  /* Surface cards: #FFFFFF */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 250);
+  --card-foreground: oklch(0.278 0.033 256.848);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.02 250);
-  /* Emerald green */
-  --primary: oklch(0.62 0.15 155);
-  --primary-foreground: oklch(0.99 0.01 155);
-  --primary-glow: oklch(0.72 0.16 155);
-  /* Charcoal */
-  --secondary: oklch(0.28 0.02 250);
-  --secondary-foreground: oklch(0.99 0.005 250);
-  --muted: oklch(0.965 0.005 250);
-  --muted-foreground: oklch(0.5 0.02 250);
-  /* Light grey accent */
-  --accent: oklch(0.94 0.005 250);
-  --accent-foreground: oklch(0.28 0.02 250);
-  --destructive: oklch(0.62 0.22 27);
-  --destructive-foreground: oklch(0.99 0.005 250);
-  --border: oklch(0.92 0.005 250);
-  --input: oklch(0.94 0.005 250);
-  --ring: oklch(0.62 0.15 155);
+  --popover-foreground: oklch(0.278 0.033 256.848);
+
+  /* Primary green: #16A34A */
+  --primary: oklch(0.627 0.194 149.214);
+  --primary-foreground: oklch(1 0 0);
+  --primary-glow: oklch(0.72 0.17 149.214);
+
+  /* Primary soft: #DCFCE7 — for subtle badges/tints, not headings */
+  --primary-soft: oklch(0.962 0.044 156.743);
+  --primary-soft-foreground: oklch(0.448 0.119 151.328);
+
+  /* Secondary is reused app-wide as heading/body text (charcoal), matches Dark Text */
+  --secondary: oklch(0.278 0.033 256.848);
+  --secondary-foreground: oklch(1 0 0);
+
+  /* Muted surfaces + Muted text: #9CA3AF */
+  --muted: oklch(0.967 0.003 264.542);
+  --muted-foreground: oklch(0.707 0.022 261.325);
+
+  /* Accent = neutral chip/hover surface, e.g. inactive retailer chip: #F1F5F9 / #475569 */
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.446 0.043 257.281);
+
+  /* Error: #EF4444 */
+  --destructive: oklch(0.637 0.237 25.331);
+  --destructive-foreground: oklch(1 0 0);
+
+  /* Success / Warning */
+  --success: oklch(0.723 0.219 149.579);
+  --warning: oklch(0.769 0.188 70.08);
+
+  /* Borders: #E5E7EB */
+  --border: oklch(0.928 0.006 264.531);
+  --input: oklch(0.928 0.006 264.531);
+  --ring: oklch(0.627 0.194 149.214);
+
   --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
-  --shadow-elegant: 0 10px 30px -12px color-mix(in oklab, var(--primary) 40%, transparent);
-  --shadow-card: 0 4px 16px -6px color-mix(in oklab, var(--foreground) 12%, transparent);
+  --shadow-elegant: 0 10px 30px -12px color-mix(in oklab, var(--primary) 35%, transparent);
+  /* shadowColor #000, opacity 0.05, radius 10, offset (0,4) */
+  --shadow-card: 0 4px 10px 0 rgb(0 0 0 / 0.05);
+
+  /* ---- Feature-specific tokens (grocery/budget/promo) ---- */
+
+  /* Special promotion carousel card: #1E293B / label #FACC15 */
+  --promo: oklch(0.279 0.041 260.031);
+  --promo-foreground: oklch(1 0 0);
+  --promo-muted-foreground: oklch(0.704 0.04 256.788);
+  --promo-label: oklch(0.852 0.199 91.936);
+
+  /* Budget card: bg #ECFDF3, title #15803D, track #D1FAE5, fill #22C55E */
+  --budget-bg: oklch(0.979 0.021 166.113);
+  --budget-title: oklch(0.527 0.154 150.069);
+  --budget-track: oklch(0.905 0.093 164.15);
+  --budget-fill: oklch(0.723 0.219 149.579);
+
+  /* Retailer chips */
+  --chip-bg: oklch(0.968 0.007 247.896);
+  --chip-text: oklch(0.446 0.043 257.281);
+  --chip-selected-bg: oklch(0.962 0.044 156.743);
+  --chip-selected-border: oklch(0.723 0.219 149.579);
+  --chip-selected-text: oklch(0.448 0.119 151.328);
+
+  /* Bottom nav */
+  --nav-active: oklch(0.627 0.194 149.214);
+  --nav-inactive: oklch(0.704 0.04 256.788);
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -114,6 +155,8 @@
   --popover-foreground: oklch(0.984 0.003 247.858);
   --primary: oklch(0.929 0.013 255.508);
   --primary-foreground: oklch(0.208 0.042 265.755);
+  --primary-soft: oklch(0.279 0.041 260.031);
+  --primary-soft-foreground: oklch(0.984 0.003 247.858);
   --secondary: oklch(0.279 0.041 260.031);
   --secondary-foreground: oklch(0.984 0.003 247.858);
   --muted: oklch(0.279 0.041 260.031);
@@ -122,9 +165,26 @@
   --accent-foreground: oklch(0.984 0.003 247.858);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.984 0.003 247.858);
+  --success: oklch(0.696 0.17 162.48);
+  --warning: oklch(0.769 0.188 70.08);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.551 0.027 264.364);
+  --promo: oklch(0.129 0.042 264.695);
+  --promo-foreground: oklch(0.984 0.003 247.858);
+  --promo-muted-foreground: oklch(0.704 0.04 256.788);
+  --promo-label: oklch(0.852 0.199 91.936);
+  --budget-bg: oklch(0.208 0.042 265.755);
+  --budget-title: oklch(0.696 0.17 162.48);
+  --budget-track: oklch(0.279 0.041 260.031);
+  --budget-fill: oklch(0.696 0.17 162.48);
+  --chip-bg: oklch(0.279 0.041 260.031);
+  --chip-text: oklch(0.704 0.04 256.788);
+  --chip-selected-bg: oklch(0.279 0.041 260.031);
+  --chip-selected-border: oklch(0.696 0.17 162.48);
+  --chip-selected-text: oklch(0.984 0.003 247.858);
+  --nav-active: oklch(0.929 0.013 255.508);
+  --nav-inactive: oklch(0.551 0.027 264.364);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);

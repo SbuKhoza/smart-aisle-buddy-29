@@ -24,6 +24,8 @@ interface Suggestion {
 }
 
 const MAX_QTY = 99;
+const inputCls =
+  "h-10 rounded-none border-x-0 border-t-0 border-b-2 border-border bg-transparent px-1 text-sm focus-visible:border-primary focus-visible:ring-0";
 
 export function QuickAddForm({
   userProducts = [],
@@ -110,7 +112,7 @@ export function QuickAddForm({
   return (
     <div className="space-y-2">
       <div>
-        <label className="mb-1 block text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+        <label className="mb-1 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
           Product name
         </label>
         <Input
@@ -126,13 +128,13 @@ export function QuickAddForm({
           }}
           placeholder="Milk"
           enterKeyHint="done"
-          className="h-12 rounded-2xl text-base"
+          className={inputCls}
         />
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <div className="min-w-0 flex-1">
-          <label className="mb-1 block text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+          <label className="mb-1 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
             Est. price
           </label>
           <Input
@@ -150,24 +152,24 @@ export function QuickAddForm({
             inputMode="decimal"
             enterKeyHint="done"
             placeholder="optional"
-            className="h-12 rounded-2xl text-base"
+            className={inputCls}
           />
         </div>
-        <div className="w-32 shrink-0">
-          <label className="mb-1 block text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+        <div className="shrink-0">
+          <label className="mb-1 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
             Qty
           </label>
-          <div className="flex h-12 items-center justify-between rounded-2xl border border-input bg-transparent px-1">
+          <div className="flex h-10 items-center justify-between gap-2 border-b-2 border-border px-1">
             <button
               type="button"
               onClick={dec}
               disabled={quantity <= 1}
               aria-label="Decrease quantity"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-secondary transition hover:bg-accent disabled:opacity-30"
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-secondary transition hover:bg-accent disabled:opacity-30"
             >
-              <Minus size={16} />
+              <Minus size={13} />
             </button>
-            <span className="min-w-[1.75rem] text-center text-base font-semibold tabular-nums text-secondary">
+            <span className="min-w-[1.25rem] text-center text-sm font-semibold tabular-nums text-secondary">
               {quantity}
             </span>
             <button
@@ -175,15 +177,15 @@ export function QuickAddForm({
               onClick={inc}
               disabled={quantity >= MAX_QTY}
               aria-label="Increase quantity"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-secondary transition hover:bg-accent disabled:opacity-30"
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-secondary transition hover:bg-accent disabled:opacity-30"
             >
-              <Plus size={16} />
+              <Plus size={13} />
             </button>
           </div>
         </div>
       </div>
 
-      <Button onClick={submit} disabled={!name.trim()} className="h-11 w-full rounded-2xl text-sm font-semibold">
+      <Button onClick={submit} disabled={!name.trim()} className="h-10 w-full rounded-2xl text-sm font-semibold">
         <Plus size={16} /> Add {quantity > 1 ? `${quantity} ` : ""}to list
       </Button>
 
