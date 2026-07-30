@@ -181,59 +181,110 @@ function Dashboard() {
             const style = STORE_STYLE[s.storeId] ?? { bg: "#64748B", text: "#fff", initials: s.storeName.slice(0, 2).toUpperCase() };
             return (
               <button
-                key={s.id}
-                type="button"
-                onClick={() => toast.info(`${s.storeName}: ${s.title}`)}
-                className="
-relative
-flex
-h-28
-w-full
-shrink-0
-snap-start
-items-center
-gap-4
-overflow-hidden
-rounded-3xl
-border
-border-white/10
-bg-gradient-to-br
-from-[#1F2A37]
-via-[#16202B]
-to-[#0F172A]
-px-6
-py-5
-text-left
-shadow-xl
-sm:w-[calc(100%-2rem)]
-"
-              >
+  key={s.id}
+  type="button"
+  onClick={() => toast.info(`${s.storeName}: ${s.title}`)}
 
-                {/* Background gradient overlay */}
-<div className="absolute inset-0 bg-gradient-to-r from-white/5 via-transparent to-transparent" />
+  /* ==========================================================
+     CHANGE CARD HEIGHT HERE
+     ========================================================== */
+  className="
+    relative
+    flex
+    h-[150px]
+    w-full
+    shrink-0
+    snap-start
+    items-center
+    gap-5
+    overflow-hidden
+    rounded-3xl
 
-{/* Green glow */}
-<div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-emerald-400/20 blur-3xl" />
+    /* ==========================================================
+       CHANGE BACKGROUND HERE
+       ========================================================== */
+    bg-gradient-to-br
+    from-emerald-50
+    via-white
+    to-green-50
 
-{/* Yellow glow */}
-<div className="absolute bottom-0 left-10 h-40 w-40 rounded-full bg-yellow-300/15 blur-3xl" />
+    border
+    border-emerald-100
 
-{/* Blue glow */}
-<div className="absolute left-1/2 top-0 h-40 w-40 rounded-full bg-sky-400/10 blur-3xl" />
+    px-6
+    py-5
+    text-left
 
-                <div
-                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-                  style={{ backgroundColor: style.bg, color: style.text }}
-                >
-                  {style.initials}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <span className="inline-flex rounded-full bg-yellow-400/15 px-3 py-1 text-[10px] font-semibold tracking-wide text-yellow-300">{s.tag}</span>
-                  <p className="mt-1 truncate text-sm font-semibold leading-snug text-[var(--promo-foreground)]">{s.title}</p>
-                  <p className="mt-0.5 text-[11px] text-[var(--promo-muted-foreground)]">{s.storeName}</p>
-                </div>
-                
-              </button>
+    shadow-[var(--shadow-card)]
+
+    sm:w-[calc(100%-2rem)]
+  "
+>
+  {/* ==========================================================
+      Decorative background circles
+      Remove these if you want a plain background
+      ========================================================== */}
+
+  <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald-100 opacity-50 blur-3xl" />
+
+  <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-lime-100 opacity-40 blur-3xl" />
+
+  {/* ==========================================================
+      Store Logo
+      ========================================================== */}
+
+  <div
+    className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-sm font-bold shadow-sm"
+    style={{
+      backgroundColor: style.bg,
+      color: style.text,
+    }}
+  >
+    {style.initials}
+  </div>
+
+  {/* ==========================================================
+      Text Content
+      ========================================================== */}
+
+  <div className="relative z-10 flex-1">
+
+    {/* ==========================================================
+        CHANGE BADGE COLOUR HERE
+        ========================================================== */}
+
+    <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+      {s.tag}
+    </span>
+
+    {/* ==========================================================
+        CHANGE TITLE COLOUR HERE
+        ========================================================== */}
+
+    <p className="mt-3 text-xl font-bold text-secondary">
+      {s.title}
+    </p>
+
+    {/* ==========================================================
+        CHANGE STORE NAME COLOUR HERE
+        ========================================================== */}
+
+    <p className="mt-1 text-sm text-muted-foreground">
+      {s.storeName}
+    </p>
+
+  </div>
+
+  {/* ==========================================================
+      Decorative grocery emoji
+      Replace this with a PNG/SVG later
+      ========================================================== */}
+
+  <div className="absolute bottom-3 right-4 text-6xl opacity-80">
+    🛒
+  </div>
+
+</button>
             );
           })}
         </div>
@@ -251,47 +302,159 @@ sm:w-[calc(100%-2rem)]
       </div>
 
       {/* Budget card — mint surface, basket illustration */}
-      <Card
-        className="relative mb-4 overflow-hidden border-0 bg-[var(--budget-bg)] p-4 shadow-[var(--shadow-card)]"
-        style={{ maxHeight: 110 }}
-      >
-        <BasketIllustration />
+      {/* ==========================================================
+    BUDGET CARD
+    ========================================================== */}
+<Card
+  className="
+    relative
+    mb-4
+    h-[150px]
 
-        <div className="relative flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[var(--budget-title)] shadow-sm">
-            <Wallet size={18} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-baseline justify-between gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--budget-title)]">Monthly budget</p>
-              {budget ? (
-                <Link to="/profile" className="shrink-0 text-[11px] font-medium text-[var(--budget-title)] hover:underline">
-                  Edit
-                </Link>
-              ) : (
-                <Button asChild size="sm" className="h-6 rounded-lg px-2 text-[10px]">
-                  <Link to="/profile">Set budget</Link>
-                </Button>
-              )}
-            </div>
-            {budget ? (
-              <>
-                <div className="flex items-baseline gap-2">
-                  <p className="text-xl font-bold text-secondary">R {budget.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">
-                    spent <AnimatedTotal value={monthlySpent} className="font-semibold text-secondary" />
-                  </p>
-                </div>
-                <div className="mt-2 h-1.5 w-2/3 overflow-hidden rounded-full bg-[var(--budget-track)]">
-                  <div className="h-full rounded-full bg-[var(--budget-fill)] transition-all" style={{ width: `${monthlyPct}%` }} />
-                </div>
-              </>
-            ) : (
-              <p className="mt-1 text-xs text-muted-foreground">Track your monthly grocery spend.</p>
-            )}
-          </div>
+    overflow-hidden
+    rounded-3xl
+
+    border
+    border-emerald-100
+
+    bg-[var(--budget-bg)]
+
+    p-6
+
+    shadow-[var(--shadow-card)]
+  "
+>
+
+  {/* ==========================================================
+      Illustration
+      Replace BasketIllustration with your own SVG later.
+      ========================================================== */}
+  <div
+  className="
+    absolute
+    bottom-2
+    right-3
+
+    opacity-50
+
+    pointer-events-none
+  "
+>
+    <BasketIllustration className="h-14 w-14" />
+  </div>
+
+  <div className="relative flex items-start gap-4">
+
+    {/* ==========================================================
+        Icon
+        Change this icon if desired
+        ========================================================== */}
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-[var(--budget-title)] shadow-sm">
+      <Wallet size={20} />
+    </div>
+
+    <div className="min-w-0 flex-1">
+
+      <div className="flex items-start justify-between">
+
+        <div>
+
+          {/* ==========================================================
+              Card Title
+              ========================================================== */}
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--budget-title)]">
+            Monthly Budget
+          </p>
+
+          {budget ? (
+            <>
+              {/* ==========================================================
+                  Budget Amount
+                  Change text size here
+                  ========================================================== */}
+              <p className="mt-1 text-3xl font-bold text-secondary">
+                R {budget.toLocaleString()}
+              </p>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                Spent{" "}
+                <AnimatedTotal
+                  value={monthlySpent}
+                  className="font-semibold text-secondary"
+                />
+              </p>
+            </>
+          ) : (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Track your monthly grocery spending.
+            </p>
+          )}
+
         </div>
-      </Card>
+
+        {/* ==========================================================
+            Edit Button
+            ========================================================== */}
+        {budget ? (
+          <Link
+            to="/profile"
+            className="
+              rounded-full
+              bg-white
+              px-3
+              py-1
+
+              text-xs
+              font-medium
+
+              text-[var(--budget-title)]
+
+              shadow-sm
+
+              hover:bg-emerald-50
+            "
+          >
+            Edit
+          </Link>
+        ) : (
+          <Button
+            asChild
+            size="sm"
+            className="rounded-full"
+          >
+            <Link to="/profile">
+              Set Budget
+            </Link>
+          </Button>
+        )}
+
+      </div>
+
+      {/* ==========================================================
+          Progress Bar
+          ========================================================== */}
+      {budget && (
+        <div className="mt-5">
+
+          <div className="h-2.5 overflow-hidden rounded-full bg-[var(--budget-track)]">
+
+            <div
+              className="h-full rounded-full bg-[var(--budget-fill)] transition-all duration-500"
+              style={{
+                width: `${monthlyPct}%`,
+              }}
+            />
+
+          </div>
+
+        </div>
+      )}
+
+    </div>
+
+  </div>
+
+</Card>
 
       {/* Store row — retailer branding kept only inside the logo, selection shown with a green ring */}
       <div className="mb-5">
