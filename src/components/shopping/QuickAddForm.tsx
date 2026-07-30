@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { Plus, CornerDownLeft } from "lucide-react";
+import { Plus, Minus, CornerDownLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import type { UserProduct } from "@/models";
 export interface QuickAddPayload {
   name: string;
   estimatedPrice: number | null;
+  quantity: number;
   productId?: string;
   category?: string;
   unit?: string;
@@ -22,6 +23,8 @@ interface Suggestion {
   estimatedPrice: number;
 }
 
+const MAX_QTY = 99;
+
 export function QuickAddForm({
   userProducts = [],
   onAdd,
@@ -33,6 +36,7 @@ export function QuickAddForm({
 }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState(1);
   const nameRef = useRef<HTMLInputElement>(null);
 
   const catalog = useMemo<Suggestion[]>(
@@ -64,8 +68,16 @@ export function QuickAddForm({
   function reset() {
     setName("");
     setPrice("");
+    setQuantity(1);
     // keep the keyboard open on mobile
     nameRef.current?.focus();
+  }
+
+  function dec() {
+    setQuantity((q) => Math.max(1, q - 1));
+  }
+  function inc() {
+    setQuantity((q) => Math.min(MAX_QTY, q + 1));
   }
 
   async function submit() {
@@ -73,15 +85,22 @@ export function QuickAddForm({
     if (!n) return;
     const p = price.trim();
     const parsed = p === "" ? null : Number(p);
+    const qty = quantity;
     reset();
-    await onAdd({ name: n, estimatedPrice: parsed !== null && Number.isFinite(parsed) ? parsed : null });
+    await onAdd({
+      name: n,
+      estimatedPrice: parsed !== null && Number.isFinite(parsed) ? parsed : null,
+      quantity: qty,
+    });
   }
 
   async function pick(s: Suggestion) {
+    const qty = quantity;
     reset();
     await onAdd({
       name: s.name,
       estimatedPrice: s.estimatedPrice,
+      quantity: qty,
       productId: s.id,
       category: s.category,
       unit: s.unit,
@@ -90,28 +109,29 @@ export function QuickAddForm({
 
   return (
     <div className="space-y-2">
+      <div>
+        <label className="mb-1 block text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+          Product name
+        </label>
+        <Input
+          ref={nameRef}
+          value={name}
+          autoFocus={autoFocus}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              submit();
+            }
+          }}
+          placeholder="Milk"
+          enterKeyHint="done"
+          className="h-12 rounded-2xl text-base"
+        />
+      </div>
+
       <div className="flex gap-2">
         <div className="min-w-0 flex-1">
-          <label className="mb-1 block text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
-            Product name
-          </label>
-          <Input
-            ref={nameRef}
-            value={name}
-            autoFocus={autoFocus}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                submit();
-              }
-            }}
-            placeholder="Milk"
-            enterKeyHint="done"
-            className="h-12 rounded-2xl text-base"
-          />
-        </div>
-        <div className="w-28 shrink-0">
           <label className="mb-1 block text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
             Est. price
           </label>
@@ -133,10 +153,38 @@ export function QuickAddForm({
             className="h-12 rounded-2xl text-base"
           />
         </div>
+        <div className="w-32 shrink-0">
+          <label className="mb-1 block text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+            Qty
+          </label>
+          <div className="flex h-12 items-center justify-between rounded-2xl border border-input bg-transparent px-1">
+            <button
+              type="button"
+              onClick={dec}
+              disabled={quantity <= 1}
+              aria-label="Decrease quantity"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-secondary transition hover:bg-accent disabled:opacity-30"
+            >
+              <Minus size={16} />
+            </button>
+            <span className="min-w-[1.75rem] text-center text-base font-semibold tabular-nums text-secondary">
+              {quantity}
+            </span>
+            <button
+              type="button"
+              onClick={inc}
+              disabled={quantity >= MAX_QTY}
+              aria-label="Increase quantity"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-secondary transition hover:bg-accent disabled:opacity-30"
+            >
+              <Plus size={16} />
+            </button>
+          </div>
+        </div>
       </div>
 
       <Button onClick={submit} disabled={!name.trim()} className="h-11 w-full rounded-2xl text-sm font-semibold">
-        <Plus size={16} /> Add to list
+        <Plus size={16} /> Add {quantity > 1 ? `${quantity} ` : ""}to list
       </Button>
 
       <AnimatePresence initial={false}>

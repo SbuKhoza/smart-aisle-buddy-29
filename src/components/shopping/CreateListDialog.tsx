@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Pencil, Store, Layers, ChevronRight } from "lucide-react";
+import { ArrowLeft, Pencil, Store, Layers, ChevronRight, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,8 @@ export interface CreateListInput {
   mode: CreateListMode;
   storeId?: string;
   storeName?: string;
+  storeIds?: string[];
+  storeNames?: string[];
 }
 
 const MODE_OPTIONS: Array<{
@@ -60,7 +62,7 @@ export function CreateListDialog({
   const [step, setStep] = useState<"mode" | "details">("mode");
   const [mode, setMode] = useState<CreateListMode>("custom");
   const [name, setName] = useState("");
-  const [storeId, setStoreId] = useState<string>(DEFAULT_STORES[0].id);
+  const [storeIds, setStoreIds] = useState<string[]>([DEFAULT_STORES[0].id]);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -68,7 +70,7 @@ export function CreateListDialog({
       setStep("mode");
       setMode("custom");
       setName("");
-      setStoreId(DEFAULT_STORES[0].id);
+      setStoreIds([DEFAULT_STORES[0].id]);
     }
   }, [open]);
 
@@ -79,11 +81,26 @@ export function CreateListDialog({
         m === "custom"
           ? "Quick list"
           : m === "store"
-            ? `${DEFAULT_STORES.find((s) => s.id === storeId)?.name ?? "Store"} run`
+            ? `${DEFAULT_STORES.find((s) => s.id === storeIds[0])?.name ?? "Store"} run`
             : "Weekly shop",
       );
     }
     setStep("details");
+  }
+
+  function toggleStore(id: string) {
+    if (mode === "combination") {
+      setStoreIds((prev) => {
+        if (prev.includes(id)) {
+          // keep at least one store selected
+          if (prev.length === 1) return prev;
+          return prev.filter((s) => s !== id);
+        }
+        return [...prev, id];
+      });
+    } else {
+      setStoreIds([id]);
+    }
   }
 
   async function submit() {
@@ -92,13 +109,22 @@ export function CreateListDialog({
     if (n.length > 60) return toast.error("Name is too long");
     setBusy(true);
     try {
-      const store = DEFAULT_STORES.find((s) => s.id === storeId);
-      await onCreate({
-        name: n,
-        mode,
-        storeId: mode === "custom" ? undefined : storeId,
-        storeName: mode === "custom" ? undefined : store?.name,
-      });
+      const selected = DEFAULT_STORES.filter((s) => storeIds.includes(s.id));
+      if (mode === "combination") {
+        await onCreate({
+          name: n,
+          mode,
+          storeIds,
+          storeNames: selected.map((s) => s.name),
+        });
+      } else {
+        await onCreate({
+          name: n,
+          mode,
+          storeId: mode === "custom" ? undefined : storeIds[0],
+          storeName: mode === "custom" ? undefined : selected[0]?.name,
+        });
+      }
       onOpenChange(false);
     } finally {
       setBusy(false);
@@ -173,27 +199,31 @@ export function CreateListDialog({
               </div>
               {mode !== "custom" && (
                 <div className="space-y-1.5">
-                  <Label>Store</Label>
+                  <Label>{mode === "combination" ? "Stores" : "Store"}</Label>
                   <div className="flex flex-wrap gap-1.5">
-                    {DEFAULT_STORES.map((s) => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => setStoreId(s.id)}
-                        className={cn(
-                          "rounded-full border px-3 py-1 text-xs transition",
-                          storeId === s.id
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-muted text-muted-foreground hover:bg-accent",
-                        )}
-                      >
-                        {s.name}
-                      </button>
-                    ))}
+                    {DEFAULT_STORES.map((s) => {
+                      const selected = storeIds.includes(s.id);
+                      return (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => toggleStore(s.id)}
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition",
+                            selected
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-muted text-muted-foreground hover:bg-accent",
+                          )}
+                        >
+                          {selected && mode === "combination" && <Check size={11} />}
+                          {s.name}
+                        </button>
+                      );
+                    })}
                   </div>
                   {mode === "combination" && (
                     <p className="text-[11px] text-muted-foreground">
-                      Starting store — you can tag items with different stores as you shop.
+                      Tap to select the stores you'll visit — pick as many as you need.
                     </p>
                   )}
                 </div>
