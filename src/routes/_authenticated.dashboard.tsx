@@ -54,11 +54,12 @@ const STORE_STYLE: Record<string, { bg: string; text: string; initials: string }
 };
 
 // Grocery basket illustration for the budget card.
-function BasketIllustration() {
+function BasketIllustration({ className }: { className?: string }) {
   return (
     <svg
-      className="pointer-events-none absolute -bottom-2 -right-1"
-      width="132" height="112" viewBox="0 0 140 120" fill="none"
+      className={cn("pointer-events-none", className)}
+      viewBox="0 0 140 120"
+      fill="none"
     >
       <defs>
         <linearGradient id="basketWeave" x1="0" y1="0" x2="0" y2="1">
@@ -104,6 +105,49 @@ function BasketIllustration() {
       <rect x="18" y="50" width="104" height="9" rx="4" fill="url(#basketRim)" />
       <path d="M46 50 Q70 18 94 50" stroke="#9C6A32" strokeWidth="6" fill="none" strokeLinecap="round" />
       <path d="M46 50 Q70 22 94 50" stroke="#D9A05B" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.7" />
+    </svg>
+  );
+}
+
+// Shopping trolley illustration, used in place of the 🛒 emoji on special cards.
+function TrolleyIllustration({ className }: { className?: string }) {
+  return (
+    <svg
+      className={cn("pointer-events-none", className)}
+      viewBox="0 0 100 90"
+      fill="none"
+    >
+      <defs>
+        <linearGradient id="trolleyBody" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#34D399" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+      </defs>
+
+      {/* basket frame */}
+      <path
+        d="M14 14 H24 L32 54 H80 L90 24 H30"
+        stroke="url(#trolleyBody)"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      {/* basket cross-hatch */}
+      <path
+        d="M33 24 L38 54 M46 24 L49 54 M59 24 L60 54 M72 24 L71 54"
+        stroke="url(#trolleyBody)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        opacity="0.55"
+      />
+      {/* handle */}
+      <path d="M14 14 L8 14" stroke="url(#trolleyBody)" strokeWidth="5" strokeLinecap="round" />
+      {/* wheels */}
+      <circle cx="40" cy="72" r="7" fill="#059669" />
+      <circle cx="40" cy="72" r="2.5" fill="#ECFDF5" />
+      <circle cx="74" cy="72" r="7" fill="#059669" />
+      <circle cx="74" cy="72" r="2.5" fill="#ECFDF5" />
     </svg>
   );
 }
@@ -181,110 +225,107 @@ function Dashboard() {
             const style = STORE_STYLE[s.storeId] ?? { bg: "#64748B", text: "#fff", initials: s.storeName.slice(0, 2).toUpperCase() };
             return (
               <button
-  key={s.id}
-  type="button"
-  onClick={() => toast.info(`${s.storeName}: ${s.title}`)}
+                key={s.id}
+                type="button"
+                onClick={() => toast.info(`${s.storeName}: ${s.title}`)}
 
-  /* ==========================================================
-     CHANGE CARD HEIGHT HERE
-     ========================================================== */
-  className="
-    relative
-    flex
-    h-[150px]
-    w-full
-    shrink-0
-    snap-start
-    items-center
-    gap-5
-    overflow-hidden
-    rounded-3xl
+                /* ==========================================================
+                   CHANGE CARD HEIGHT HERE
+                   ========================================================== */
+                className="
+                  relative
+                  flex
+                  h-[150px]
+                  w-full
+                  shrink-0
+                  snap-start
+                  items-center
+                  gap-5
+                  overflow-hidden
+                  rounded-3xl
 
-    /* ==========================================================
-       CHANGE BACKGROUND HERE
-       ========================================================== */
-    bg-gradient-to-br
-    from-emerald-50
-    via-white
-    to-green-50
+                  /* ==========================================================
+                     CHANGE BACKGROUND HERE
+                     ========================================================== */
+                  bg-gradient-to-br
+                  from-emerald-50
+                  via-white
+                  to-green-50
 
-    border
-    border-emerald-100
+                  border
+                  border-emerald-100
 
-    px-6
-    py-5
-    text-left
+                  px-6
+                  py-5
+                  text-left
 
-    shadow-[var(--shadow-card)]
+                  shadow-[var(--shadow-card)]
 
-    sm:w-[calc(100%-2rem)]
-  "
->
-  {/* ==========================================================
-      Decorative background circles
-      Remove these if you want a plain background
-      ========================================================== */}
+                  sm:w-[calc(100%-2rem)]
+                "
+              >
+                {/* ==========================================================
+                    Decorative background circles
+                    Remove these if you want a plain background
+                    ========================================================== */}
 
-  <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald-100 opacity-50 blur-3xl" />
+                <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald-100 opacity-50 blur-3xl" />
 
-  <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-lime-100 opacity-40 blur-3xl" />
+                <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-lime-100 opacity-40 blur-3xl" />
 
-  {/* ==========================================================
-      Store Logo
-      ========================================================== */}
+                {/* ==========================================================
+                    Store Logo
+                    ========================================================== */}
 
-  <div
-    className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-sm font-bold shadow-sm"
-    style={{
-      backgroundColor: style.bg,
-      color: style.text,
-    }}
-  >
-    {style.initials}
-  </div>
+                <div
+                  className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-sm font-bold shadow-sm"
+                  style={{
+                    backgroundColor: style.bg,
+                    color: style.text,
+                  }}
+                >
+                  {style.initials}
+                </div>
 
-  {/* ==========================================================
-      Text Content
-      ========================================================== */}
+                {/* ==========================================================
+                    Text Content
+                    ========================================================== */}
 
-  <div className="relative z-10 flex-1">
+                <div className="relative z-10 flex-1">
 
-    {/* ==========================================================
-        CHANGE BADGE COLOUR HERE
-        ========================================================== */}
+                  {/* ==========================================================
+                      CHANGE BADGE COLOUR HERE
+                      ========================================================== */}
 
-    <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-700">
-      {s.tag}
-    </span>
+                  <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+                    {s.tag}
+                  </span>
 
-    {/* ==========================================================
-        CHANGE TITLE COLOUR HERE
-        ========================================================== */}
+                  {/* ==========================================================
+                      CHANGE TITLE COLOUR HERE
+                      ========================================================== */}
 
-    <p className="mt-3 text-xl font-bold text-secondary">
-      {s.title}
-    </p>
+                  <p className="mt-3 text-xl font-bold text-secondary">
+                    {s.title}
+                  </p>
 
-    {/* ==========================================================
-        CHANGE STORE NAME COLOUR HERE
-        ========================================================== */}
+                  {/* ==========================================================
+                      CHANGE STORE NAME COLOUR HERE
+                      ========================================================== */}
 
-    <p className="mt-1 text-sm text-muted-foreground">
-      {s.storeName}
-    </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {s.storeName}
+                  </p>
 
-  </div>
+                </div>
 
-  {/* ==========================================================
-      Decorative grocery emoji
-      Replace this with a PNG/SVG later
-      ========================================================== */}
+                {/* ==========================================================
+                    Decorative trolley illustration (SVG, replaces the old emoji)
+                    ========================================================== */}
 
-  <div className="absolute bottom-3 right-4 text-6xl opacity-80">
-    🛒
-  </div>
+                <TrolleyIllustration className="absolute bottom-3 right-4 h-10 w-10 opacity-80" />
 
-</button>
+              </button>
             );
           })}
         </div>
@@ -303,158 +344,159 @@ function Dashboard() {
 
       {/* Budget card — mint surface, basket illustration */}
       {/* ==========================================================
-    BUDGET CARD
-    ========================================================== */}
-<Card
-  className="
-    relative
-    mb-4
-    h-[150px]
+          BUDGET CARD
+          ========================================================== */}
+      <Card
+        className="
+          relative
+          mb-4
+          h-[150px]
 
-    overflow-hidden
-    rounded-3xl
+          overflow-hidden
+          rounded-3xl
 
-    border
-    border-emerald-100
+          border
+          border-emerald-100
 
-    bg-[var(--budget-bg)]
+          bg-[var(--budget-bg)]
 
-    p-6
+          p-6
 
-    shadow-[var(--shadow-card)]
-  "
->
-
-  {/* ==========================================================
-      Illustration
-      Replace BasketIllustration with your own SVG later.
-      ========================================================== */}
-  <div
-  className="
-    absolute
-    bottom-2
-    right-3
-
-    opacity-50
-
-    pointer-events-none
-  "
->
-    <BasketIllustration className="h-14 w-14" />
-  </div>
-
-  <div className="relative flex items-start gap-4">
-
-    {/* ==========================================================
-        Icon
-        Change this icon if desired
-        ========================================================== */}
-    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-[var(--budget-title)] shadow-sm">
-      <Wallet size={20} />
-    </div>
-
-    <div className="min-w-0 flex-1">
-
-      <div className="flex items-start justify-between">
-
-        <div>
-
-          {/* ==========================================================
-              Card Title
-              ========================================================== */}
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--budget-title)]">
-            Monthly Budget
-          </p>
-
-          {budget ? (
-            <>
-              {/* ==========================================================
-                  Budget Amount
-                  Change text size here
-                  ========================================================== */}
-              <p className="mt-1 text-3xl font-bold text-secondary">
-                R {budget.toLocaleString()}
-              </p>
-
-              <p className="mt-1 text-sm text-muted-foreground">
-                Spent{" "}
-                <AnimatedTotal
-                  value={monthlySpent}
-                  className="font-semibold text-secondary"
-                />
-              </p>
-            </>
-          ) : (
-            <p className="mt-2 text-sm text-muted-foreground">
-              Track your monthly grocery spending.
-            </p>
-          )}
-
-        </div>
+          shadow-[var(--shadow-card)]
+        "
+      >
 
         {/* ==========================================================
-            Edit Button
+            Illustration
+            Replace BasketIllustration with your own SVG later.
             ========================================================== */}
-        {budget ? (
-          <Link
-            to="/profile"
-            className="
-              rounded-full
-              bg-white
-              px-3
-              py-1
+        <div
+          className="
+            absolute
+            bottom-2
+            right-3
+            h-14 w-14
 
-              text-xs
-              font-medium
+            opacity-50
 
-              text-[var(--budget-title)]
+            pointer-events-none
+          "
+        >
+          <BasketIllustration className="h-full w-full" />
+        </div>
 
-              shadow-sm
+        <div className="relative flex items-start gap-4">
 
-              hover:bg-emerald-50
-            "
-          >
-            Edit
-          </Link>
-        ) : (
-          <Button
-            asChild
-            size="sm"
-            className="rounded-full"
-          >
-            <Link to="/profile">
-              Set Budget
-            </Link>
-          </Button>
-        )}
+          {/* ==========================================================
+              Icon
+              Change this icon if desired
+              ========================================================== */}
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-[var(--budget-title)] shadow-sm">
+            <Wallet size={20} />
+          </div>
 
-      </div>
+          <div className="min-w-0 flex-1">
 
-      {/* ==========================================================
-          Progress Bar
-          ========================================================== */}
-      {budget && (
-        <div className="mt-5">
+            <div className="flex items-start justify-between">
 
-          <div className="h-2.5 overflow-hidden rounded-full bg-[var(--budget-track)]">
+              <div>
 
-            <div
-              className="h-full rounded-full bg-[var(--budget-fill)] transition-all duration-500"
-              style={{
-                width: `${monthlyPct}%`,
-              }}
-            />
+                {/* ==========================================================
+                    Card Title
+                    ========================================================== */}
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--budget-title)]">
+                  Monthly Budget
+                </p>
+
+                {budget ? (
+                  <>
+                    {/* ==========================================================
+                        Budget Amount
+                        Change text size here
+                        ========================================================== */}
+                    <p className="mt-1 text-1xl font-bold text-secondary">
+                      R {budget.toLocaleString()}
+                    </p>
+
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Spent{" "}
+                      <AnimatedTotal
+                        value={monthlySpent}
+                        className="font-semibold text-secondary"
+                      />
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Track your monthly grocery spending.
+                  </p>
+                )}
+
+              </div>
+
+              {/* ==========================================================
+                  Edit Button
+                  ========================================================== */}
+              {budget ? (
+                <Link
+                  to="/profile"
+                  className="
+                    rounded-full
+                    bg-white
+                    px-3
+                    py-1
+
+                    text-xs
+                    font-medium
+
+                    text-[var(--budget-title)]
+
+                    shadow-sm
+
+                    hover:bg-emerald-50
+                  "
+                >
+                  Edit
+                </Link>
+              ) : (
+                <Button
+                  asChild
+                  size="sm"
+                  className="rounded-full"
+                >
+                  <Link to="/profile">
+                    Set Budget
+                  </Link>
+                </Button>
+              )}
+
+            </div>
+
+            {/* ==========================================================
+                Progress Bar
+                ========================================================== */}
+            {budget && (
+              <div className="mt-5">
+
+                <div className="h-1 overflow-hidden rounded-full bg-[var(--budget-track)]">
+
+                  <div
+                    className="h-full rounded-full bg-[var(--budget-fill)] transition-all duration-500"
+                    style={{
+                      width: `${monthlyPct}%`,
+                    }}
+                  />
+
+                </div>
+
+              </div>
+            )}
 
           </div>
 
         </div>
-      )}
 
-    </div>
-
-  </div>
-
-</Card>
+      </Card>
 
       {/* Store row — retailer branding kept only inside the logo, selection shown with a green ring */}
       <div className="mb-5">
@@ -469,14 +511,6 @@ function Dashboard() {
                 onClick={() => setSelectedStore(s.id)}
                 className="flex shrink-0 flex-col items-center gap-1"
               >
-                <div
-    className="absolute inset-0 opacity-[0.03]"
-    style={{
-        backgroundImage:
-            "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
-        backgroundSize: "24px 24px",
-    }}
-/>
                 <div
                   className={cn(
                     "flex h-11 w-11 items-center justify-center rounded-full text-[11px] font-bold transition-all",
