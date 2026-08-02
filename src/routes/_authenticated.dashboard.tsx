@@ -208,7 +208,7 @@ function Dashboard() {
     <div className="mx-auto w-full max-w-5xl px-4 py-6 md:px-8 md:py-10">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
         <p className="text-sm text-muted-foreground">{greeting()},</p>
-        <h1 className="text-2xl font-bold tracking-tight text-secondary md:text-3xl">
+        <h1 className="text-[22px] font-bold tracking-tight text-secondary md:text-2xl">
           Welcome back, {profile?.firstName || "Shopper"} 👋
         </h1>
       </motion.div>
@@ -235,27 +235,27 @@ function Dashboard() {
                 className="
                   relative
                   flex
-                  h-[150px]
+                  h-[130px]
                   w-full
                   shrink-0
                   snap-start
                   items-center
                   gap-5
                   overflow-hidden
-                  rounded-3xl
+                  rounded-2xl
 
                   /* ==========================================================
                      CHANGE BACKGROUND HERE
                      ========================================================== */
                   bg-gradient-to-br
-                  from-emerald-50
-                  via-white
-                  to-green-50
+                  from-primary/10
+                  via-card
+                  to-card
 
                   border
-                  border-emerald-100
+                  border-border
 
-                  px-6
+                  px-4
                   py-5
                   text-left
 
@@ -269,9 +269,9 @@ function Dashboard() {
                     Remove these if you want a plain background
                     ========================================================== */}
 
-                <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald-100 opacity-50 blur-3xl" />
+                <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-primary/20 opacity-50 blur-3xl" />
 
-                <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-lime-100 opacity-40 blur-3xl" />
+                <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-primary/10 opacity-40 blur-3xl" />
 
                 {/* ==========================================================
                     Store Logo
@@ -297,7 +297,7 @@ function Dashboard() {
                       CHANGE BADGE COLOUR HERE
                       ========================================================== */}
 
-                  <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+                  <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
                     {s.tag}
                   </span>
 
@@ -350,17 +350,17 @@ function Dashboard() {
         className="
           relative
           mb-4
-          h-[150px]
+          h-[130px]
 
           overflow-hidden
-          rounded-3xl
+          rounded-2xl
 
           border
-          border-emerald-100
+          border-border
 
           bg-[var(--budget-bg)]
 
-          p-6
+          p-4
 
           shadow-[var(--shadow-card)]
         "
@@ -391,7 +391,7 @@ function Dashboard() {
               Icon
               Change this icon if desired
               ========================================================== */}
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-[var(--budget-title)] shadow-sm">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-card text-[var(--budget-title)] shadow-sm">
             <Wallet size={20} />
           </div>
 
@@ -442,7 +442,7 @@ function Dashboard() {
                   to="/profile"
                   className="
                     rounded-full
-                    bg-white
+                    bg-card
                     px-3
                     py-1
 
@@ -453,7 +453,7 @@ function Dashboard() {
 
                     shadow-sm
 
-                    hover:bg-emerald-50
+                    hover:opacity-80
                   "
                 >
                   Edit
@@ -581,7 +581,7 @@ function Dashboard() {
           )}
         </Card>
 
-        <Card className="rounded-2xl border-border p-5 shadow-[var(--shadow-card)] md:col-span-3">
+        <Card className="rounded-2xl border-border p-4 shadow-[var(--shadow-card)] md:col-span-3">
           <div className="mb-3 flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-widest text-muted-foreground">Active lists</p>
@@ -621,7 +621,7 @@ function Dashboard() {
           )}
         </Card>
 
-        <Card className="rounded-2xl border-border p-5 shadow-[var(--shadow-card)] md:col-span-3">
+        <Card className="rounded-2xl border-border p-4 shadow-[var(--shadow-card)] md:col-span-3">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-xs uppercase tracking-widest text-muted-foreground">Recent activity</p>
             <Link to="/history" className="text-xs font-medium text-primary hover:underline">View history</Link>
