@@ -48,7 +48,7 @@ export function ListRow({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -16 }}
       className={cn(
-        "flex items-center gap-2.5 rounded-2xl border border-border bg-card px-3 py-2",
+        "flex items-center gap-2.5 rounded-xl border border-border bg-card px-3 py-1.5 active:bg-accent/40",
         item.purchased && "border-primary/30 bg-primary/5",
       )}
     >
@@ -58,7 +58,7 @@ export function ListRow({
         <div className="flex items-center gap-1.5">
           <p
             className={cn(
-              "truncate text-sm font-semibold text-secondary",
+              "truncate text-[15px] font-medium leading-tight text-secondary",
               item.purchased && "text-muted-foreground line-through",
             )}
           >
@@ -70,7 +70,7 @@ export function ListRow({
             </span>
           )}
         </div>
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-[11px] leading-tight text-muted-foreground">
           Est {est == null ? "—" : `R ${est}`} · Actual{" "}
           {item.actualPrice == null ? "—" : `R ${item.actualPrice}`}
         </p>

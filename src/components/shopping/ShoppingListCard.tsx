@@ -24,31 +24,31 @@ export function ShoppingListCard({ list, index = 0 }: { list: ShoppingList; inde
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
       <Link to="/shopping-lists/$listId" params={{ listId: list.id }}>
-        <Card className="group h-full rounded-3xl border-border p-5 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <ListChecks size={20} />
+        <Card className="group h-full gap-0 rounded-2xl border-border p-3.5 shadow-[var(--shadow-card)] transition-all active:scale-[0.99] hover:shadow-[var(--shadow-elegant)]">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <ListChecks size={17} />
               </div>
-              <div>
-                <h3 className="text-base font-semibold text-secondary line-clamp-1">{list.name}</h3>
-                <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                  <Calendar size={12} /> {fmt(list.createdAt)}
+              <div className="min-w-0">
+                <h3 className="line-clamp-1 text-[15px] font-semibold leading-tight text-secondary">{list.name}</h3>
+                <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <Calendar size={11} /> {fmt(list.createdAt)}
                 </p>
               </div>
             </div>
-            <Badge className={badge.cls} variant="secondary">{badge.label}</Badge>
+            <Badge className={`${badge.cls} shrink-0 text-[10px]`} variant="secondary">{badge.label}</Badge>
           </div>
-          <div className="mt-4 flex items-end justify-between">
+          <div className="mt-3 flex items-end justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Items</p>
-              <p className="text-lg font-semibold text-secondary">{list.itemCount ?? 0}</p>
+              <p className="text-[11px] text-muted-foreground">Items</p>
+              <p className="text-[15px] font-semibold text-secondary">{list.itemCount ?? 0}</p>
             </div>
             <div className="text-right">
-              <p className="flex items-center justify-end gap-1 text-xs text-muted-foreground">
-                <Wallet size={12} /> Est. total
+              <p className="flex items-center justify-end gap-1 text-[11px] text-muted-foreground">
+                <Wallet size={11} /> Est. total
               </p>
-              <p className="text-lg font-semibold text-primary">R {(list.estimatedTotal ?? 0).toLocaleString()}</p>
+              <p className="text-[15px] font-semibold text-primary">R {(list.estimatedTotal ?? 0).toLocaleString()}</p>
             </div>
           </div>
         </Card>
