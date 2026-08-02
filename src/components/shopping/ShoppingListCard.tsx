@@ -16,10 +16,10 @@ export function ShoppingListCard({ list, index = 0 }: { list: ShoppingList; inde
     status === "shopping"
       ? { label: "Shopping", cls: "bg-primary/15 text-primary" }
       : status === "completed"
-        ? { label: "Completed", cls: "bg-emerald-100 text-emerald-700" }
+        ? { label: "Completed", cls: "bg-primary/10 text-primary" }
         : status === "archived"
-          ? { label: "Archived", cls: "bg-slate-100 text-slate-600" }
-          : { label: "Active", cls: "bg-sky-100 text-sky-700" };
+          ? { label: "Archived", cls: "bg-muted text-muted-foreground" }
+          : { label: "Active", cls: "bg-accent text-accent-foreground" };
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>

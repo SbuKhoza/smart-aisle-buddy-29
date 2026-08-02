@@ -26,7 +26,7 @@ export function BudgetCard({
       ? "[&>div]:bg-red-500"
       : status === "warn"
         ? "[&>div]:bg-orange-500"
-        : "[&>div]:bg-emerald-500";
+        : "[&>div]:bg-primary";
   const remaining = (budget ?? 0) - spend;
 
   return (
@@ -44,7 +44,7 @@ export function BudgetCard({
           </div>
         </div>
         {status === "over" && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-700">
+          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-destructive">
             <AlertTriangle size={12} /> Over budget
           </span>
         )}
@@ -57,7 +57,7 @@ export function BudgetCard({
             <span
               className={cn(
                 "font-semibold",
-                status === "over" ? "text-red-600" : status === "warn" ? "text-orange-500" : "text-emerald-600",
+                status === "over" ? "text-destructive" : status === "warn" ? "text-orange-500" : "text-primary",
               )}
             >
               {remaining >= 0

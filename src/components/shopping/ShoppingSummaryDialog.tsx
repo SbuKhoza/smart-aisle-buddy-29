@@ -31,15 +31,15 @@ export function ShoppingSummaryDialog({
           </div>
           <div className="flex items-center justify-between rounded-2xl border border-border p-3">
             <span className="text-sm text-muted-foreground">Difference</span>
-            <span className={"flex items-center gap-1 text-sm font-semibold " + (diff > 0 ? "text-red-600" : "text-emerald-600")}>
+            <span className={"flex items-center gap-1 text-sm font-semibold " + (diff > 0 ? "text-destructive" : "text-primary")}>
               {diff > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
               R {Math.round(Math.abs(diff)).toLocaleString()}
             </span>
           </div>
           {data.budget != null && (
-            <div className={"flex items-center justify-between rounded-2xl border p-3 " + (overBudget ? "border-red-200 bg-red-50" : "border-emerald-200 bg-emerald-50")}>
+            <div className={"flex items-center justify-between rounded-2xl border p-3 " + (overBudget ? "border-destructive/30 bg-destructive/10" : "border-primary/30 bg-primary/10")}>
               <span className="flex items-center gap-2 text-sm"><Wallet size={14} /> Budget R {data.budget.toLocaleString()}</span>
-              <span className={"text-sm font-semibold " + (overBudget ? "text-red-700" : "text-emerald-700")}>
+              <span className={"text-sm font-semibold " + (overBudget ? "text-destructive" : "text-primary")}>
                 {overBudget ? `R ${Math.round(Math.abs(remaining!)).toLocaleString()} over` : `R ${Math.round(remaining!).toLocaleString()} left`}
               </span>
             </div>
