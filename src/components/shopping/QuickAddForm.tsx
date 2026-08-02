@@ -25,7 +25,7 @@ interface Suggestion {
 
 const MAX_QTY = 99;
 const inputCls =
-  "h-10 rounded-none border-x-0 border-t-0 border-b-2 border-border bg-transparent px-1 text-sm focus-visible:border-primary focus-visible:ring-0";
+  "h-9 rounded-none border-x-0 border-t-0 border-b-2 border-border bg-transparent px-1 text-[15px] focus-visible:border-primary focus-visible:ring-0";
 
 export function QuickAddForm({
   userProducts = [],
@@ -112,7 +112,7 @@ export function QuickAddForm({
   return (
     <div className="space-y-2">
       <div>
-        <label className="mb-1 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+        <label className="mb-0.5 block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           Product name
         </label>
         <Input
@@ -134,7 +134,7 @@ export function QuickAddForm({
 
       <div className="flex gap-3">
         <div className="min-w-0 flex-1">
-          <label className="mb-1 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+          <label className="mb-0.5 block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             Est. price
           </label>
           <Input
@@ -156,10 +156,10 @@ export function QuickAddForm({
           />
         </div>
         <div className="shrink-0">
-          <label className="mb-1 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+          <label className="mb-0.5 block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             Qty
           </label>
-          <div className="flex h-10 items-center justify-between gap-2 border-b-2 border-border px-1">
+          <div className="flex h-9 items-center justify-between gap-2 border-b-2 border-border px-1">
             <button
               type="button"
               onClick={dec}
@@ -185,7 +185,7 @@ export function QuickAddForm({
         </div>
       </div>
 
-      <Button onClick={submit} disabled={!name.trim()} className="h-10 w-full rounded-2xl text-sm font-semibold">
+      <Button onClick={submit} disabled={!name.trim()} className="h-10 w-full rounded-xl text-[15px] font-semibold active:scale-[0.99]">
         <Plus size={16} /> Add {quantity > 1 ? `${quantity} ` : ""}to list
       </Button>
 
@@ -195,9 +195,9 @@ export function QuickAddForm({
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="overflow-hidden rounded-2xl border border-border bg-card"
+            className="overflow-hidden rounded-xl border border-border bg-card"
           >
-            <p className="border-b border-border px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+            <p className="border-b border-border px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               Suggestions · optional
             </p>
             {suggestions.map((s) => (
@@ -206,9 +206,9 @@ export function QuickAddForm({
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => pick(s)}
-                className="flex w-full items-center gap-3 border-b border-border px-3 py-2 text-left last:border-b-0 hover:bg-accent"
+                className="flex w-full items-center gap-3 border-b border-border px-3 py-2 text-left last:border-b-0 active:bg-accent hover:bg-accent"
               >
-                <span className="min-w-0 flex-1 truncate text-sm text-secondary">{s.name}</span>
+                <span className="min-w-0 flex-1 truncate text-[14px] text-secondary">{s.name}</span>
                 <span className="text-xs font-semibold text-primary">R {s.estimatedPrice}</span>
                 <CornerDownLeft size={13} className="text-muted-foreground" />
               </button>
