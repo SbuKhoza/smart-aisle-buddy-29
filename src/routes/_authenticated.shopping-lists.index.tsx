@@ -92,10 +92,10 @@ function ShoppingListsPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-6 md:px-8 md:py-10">
+    <div className="mx-auto w-full max-w-5xl px-4 py-5 md:px-8 md:py-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-secondary md:text-3xl">Shopping Lists</h1>
+          <h1 className="text-[22px] font-bold tracking-tight text-secondary md:text-2xl">Shopping Lists</h1>
           <p className="mt-1 text-sm text-muted-foreground">Plan, track and reuse your grocery lists.</p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="hidden md:inline-flex">
