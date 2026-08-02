@@ -15,7 +15,7 @@ export function HistoryCard({ trip, index = 0 }: { trip: ShoppingHistoryEntry; i
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
       <Link to="/history/$tripId" params={{ tripId: trip.id }}>
-        <Card className="rounded-3xl border-border p-5 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
+        <Card className="rounded-2xl border-border p-3.5 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -27,9 +27,9 @@ export function HistoryCard({ trip, index = 0 }: { trip: ShoppingHistoryEntry; i
               </div>
             </div>
             {overBudget ? (
-              <Badge variant="secondary" className="bg-red-100 text-red-700">Over budget</Badge>
+              <Badge variant="secondary" className="bg-destructive/10 text-destructive">Over budget</Badge>
             ) : (
-              <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">Completed</Badge>
+              <Badge variant="secondary" className="bg-primary/10 text-primary">Completed</Badge>
             )}
           </div>
           <div className="mt-4 flex items-end justify-between">

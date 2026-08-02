@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "../lib/firebase-auth";
 import { ClientOnly } from "../components/ClientOnly";
+import { ThemeProvider } from "../lib/theme";
 import { FullScreenLoader } from "../components/FullScreenLoader";
 import { Toaster } from "../components/ui/sonner";
 
@@ -137,10 +138,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ClientOnly fallback={<FullScreenLoader label="Loading AISLE SPY" />}>
-        <AuthProvider>
-          <Outlet />
-          <Toaster position="top-center" richColors />
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <Outlet />
+            <Toaster position="top-center" richColors />
+          </AuthProvider>
+        </ThemeProvider>
       </ClientOnly>
     </QueryClientProvider>
   );

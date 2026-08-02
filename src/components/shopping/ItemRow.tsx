@@ -21,7 +21,7 @@ export function ItemRow({
   return (
     <motion.div layout initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -20 }}
       className={cn("flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-sm transition-colors",
-        item.purchased && "bg-emerald-50/60")}>
+        item.purchased && "bg-primary/5")}>
       <Checkbox checked={item.purchased} onCheckedChange={onToggle} className="mt-0.5" />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">

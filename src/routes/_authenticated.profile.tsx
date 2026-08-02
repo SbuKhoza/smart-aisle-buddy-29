@@ -79,9 +79,9 @@ function ProfilePage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8 md:px-8">
-      <h1 className="mb-6 text-2xl font-bold text-secondary">Profile</h1>
+      <h1 className="mb-4 text-[22px] font-bold text-secondary">Profile</h1>
 
-      <Card className="rounded-3xl border-border p-6 shadow-[var(--shadow-card)]">
+      <Card className="rounded-2xl border-border p-4 shadow-[var(--shadow-card)]">
         <div className="mb-6 flex items-center gap-4">
           <Avatar className="h-16 w-16">
             <AvatarImage src={profile?.photoURL ?? user?.photoURL ?? undefined} />

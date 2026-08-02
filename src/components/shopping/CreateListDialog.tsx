@@ -46,7 +46,7 @@ const MODE_OPTIONS: Array<{
     title: "Combination",
     body: "Multiple stores in one trip.",
     icon: Layers,
-    accent: "from-sky-500/15 to-sky-500/5 text-sky-600",
+    accent: "from-accent to-accent/40 text-accent-foreground",
   },
 ];
 

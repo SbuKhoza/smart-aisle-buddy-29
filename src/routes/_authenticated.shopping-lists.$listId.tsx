@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft, ShoppingCart, MoreHorizontal, Pencil, Copy, Archive, Trash2, Wallet, CheckCircle2, Check,
+  ArrowLeft, ShoppingCart, MoreHorizontal, Pencil, Copy, Archive, Trash2, Wallet, CheckCircle2, Check, Plus, X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -57,6 +57,7 @@ function ListDetailPage() {
   const [budgetValue, setBudgetValue] = useState("");
   const [deleteListOpen, setDeleteListOpen] = useState(false);
   const [savingTrip, setSavingTrip] = useState(false);
+  const [addOpen, setAddOpen] = useState(true);
 
   useEffect(() => {
     if (!user) return;
@@ -168,20 +169,20 @@ function ListDetailPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pb-44 pt-6 md:px-8 md:pb-32 md:pt-10">
-      <div className="mb-4 flex items-center gap-2">
-        <Link to="/shopping-lists" className="rounded-full p-2 hover:bg-accent"><ArrowLeft size={18} /></Link>
+    <div className="mx-auto w-full max-w-2xl px-4 pb-40 pt-4 md:px-8 md:pb-28 md:pt-8">
+      <div className="mb-3 flex items-center gap-1.5">
+        <Link to="/shopping-lists" className="-ml-1 rounded-full p-2 text-secondary active:bg-accent"><ArrowLeft size={18} /></Link>
         <div className="min-w-0 flex-1">
-          {shopping && <p className="text-[11px] font-medium uppercase tracking-widest text-primary">Shopping mode</p>}
-          <h1 className="truncate text-2xl font-bold text-secondary md:text-3xl">{list.name}</h1>
-          <p className="text-xs text-muted-foreground">
+          {shopping && <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">Shopping mode</p>}
+          <h1 className="truncate text-[19px] font-bold leading-tight tracking-tight text-secondary md:text-2xl">{list.name}</h1>
+          <p className="text-[11px] text-muted-foreground">
             {items.length} item{items.length === 1 ? "" : "s"}
             {budget != null ? ` · Budget ${money(budget)}` : ""}
           </p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon"><MoreHorizontal size={18} /></Button>
+            <Button variant="ghost" size="icon" className="h-9 w-9"><MoreHorizontal size={18} /></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => { setRenameValue(list.name); setRenameOpen(true); }}>
@@ -208,13 +209,38 @@ function ListDetailPage() {
         </DropdownMenu>
       </div>
 
-      <Card className="mb-4 rounded-3xl border-border p-4">
-        <QuickAddForm userProducts={userProducts} onAdd={addItem} />
-      </Card>
+      {addOpen ? (
+        <Card className="mb-3 gap-0 rounded-2xl border-border p-3 shadow-[var(--shadow-card)]">
+          {shopping && (
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Add while shopping
+              </p>
+              <button
+                type="button"
+                aria-label="Close add product"
+                onClick={() => setAddOpen(false)}
+                className="rounded-full p-1 text-muted-foreground active:bg-accent"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+          <QuickAddForm userProducts={userProducts} onAdd={addItem} autoFocus={shopping} />
+        </Card>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setAddOpen(true)}
+          className="mb-3 flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card text-[15px] font-medium text-secondary active:bg-accent"
+        >
+          <Plus size={16} /> Add product
+        </button>
+      )}
 
       {complete && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="mb-4 rounded-3xl border-primary/30 bg-primary/5 p-5">
+          <Card className="mb-3 gap-0 rounded-2xl border-primary/30 bg-primary/5 p-4">
             <div className="mb-3 flex items-center gap-2 text-primary">
               <CheckCircle2 size={18} />
               <p className="text-base font-bold">Shopping complete</p>
@@ -241,7 +267,7 @@ function ListDetailPage() {
           body="Type a product name above and hit Add to list. A price is optional."
         />
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <AnimatePresence initial={false}>
             {items.map((item) => (
               <ListRow
@@ -259,16 +285,16 @@ function ListDetailPage() {
         </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-16 z-30 border-t border-border bg-card/95 px-4 py-3 backdrop-blur md:bottom-0">
-        <div className="mx-auto flex max-w-3xl items-center gap-3">
-          <div className="grid flex-1 grid-cols-2 gap-x-4 gap-y-0.5 sm:grid-cols-4">
+      <div className="fixed inset-x-0 bottom-16 z-30 border-t border-border bg-card/95 px-4 py-2.5 backdrop-blur md:bottom-0">
+        <div className="mx-auto flex max-w-2xl items-center gap-3">
+          <div className="grid flex-1 grid-cols-2 gap-x-4 sm:grid-cols-4">
             <Stat label="Estimated" value={money(totals.estimated)} />
             <Stat label="Actual" value={money(totals.actual)} strong />
             <Stat label="Remaining" value={remaining == null ? "—" : money(remaining)}
               danger={remaining != null && remaining < 0} />
             <Stat label="Purchased" value={`${totals.purchased}/${items.length}`} />
           </div>
-          <Button onClick={toggleShopping} variant={shopping ? "outline" : "default"} className="shrink-0 rounded-full">
+          <Button onClick={toggleShopping} variant={shopping ? "outline" : "default"} size="sm" className="h-9 shrink-0 rounded-full px-4">
             {shopping ? "Pause" : (<><ShoppingCart size={16} /> Start shopping</>)}
           </Button>
         </div>
