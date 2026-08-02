@@ -23,7 +23,7 @@ export function BudgetCard({
   const pct = budget && budget > 0 ? Math.min(100, (spend / budget) * 100) : 0;
   const barColor =
     status === "over"
-      ? "[&>div]:bg-red-500"
+      ? "[&>div]:bg-destructive"
       : status === "warn"
         ? "[&>div]:bg-orange-500"
         : "[&>div]:bg-primary";
@@ -44,7 +44,7 @@ export function BudgetCard({
           </div>
         </div>
         {status === "over" && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-destructive">
+          <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-semibold text-destructive">
             <AlertTriangle size={12} /> Over budget
           </span>
         )}

@@ -27,7 +27,7 @@ export function HistoryCard({ trip, index = 0 }: { trip: ShoppingHistoryEntry; i
               </div>
             </div>
             {overBudget ? (
-              <Badge variant="secondary" className="bg-red-100 text-red-700">Over budget</Badge>
+              <Badge variant="secondary" className="bg-destructive/10 text-destructive">Over budget</Badge>
             ) : (
               <Badge variant="secondary" className="bg-primary/10 text-primary">Completed</Badge>
             )}
