@@ -21,6 +21,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated.history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedShoppingListsIndexRouteImport } from './routes/_authenticated.shopping-lists.index'
 import { Route as AuthenticatedHistoryIndexRouteImport } from './routes/_authenticated.history.index'
 import { Route as AuthenticatedShoppingListsListIdRouteImport } from './routes/_authenticated.shopping-lists.$listId'
@@ -87,6 +88,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedShoppingListsIndexRoute =
   AuthenticatedShoppingListsIndexRouteImport.update({
     id: '/',
@@ -121,6 +127,7 @@ const AuthenticatedShoppingListsListIdShopRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/onboarding'
+    | '/admin'
     | '/dashboard'
     | '/history'
     | '/profile'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/onboarding'
+    | '/admin'
     | '/dashboard'
     | '/profile'
     | '/settings'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/onboarding'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/history'
     | '/_authenticated/profile'
@@ -323,6 +335,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/shopping-lists/': {
       id: '/_authenticated/shopping-lists/'
       path: '/'
@@ -407,6 +426,7 @@ const AuthenticatedShoppingListsRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -416,6 +436,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
