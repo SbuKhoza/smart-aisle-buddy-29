@@ -5,11 +5,14 @@ import {
   Clock,
   Tag,
   Settings as SettingsIcon,
+  Shield,
   User as UserIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "./BrandLogo";
+import { OfflineBanner } from "./OfflineBanner";
+import { useIsAdmin } from "@/lib/use-admin";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: Home },
@@ -21,6 +24,7 @@ const NAV = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isAdmin } = useIsAdmin();
   return (
     <div className="flex min-h-screen bg-background">
       <aside className="hidden w-60 shrink-0 border-r border-border bg-card px-3 py-5 md:flex md:flex-col">
@@ -47,6 +51,20 @@ export function AppShell({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors",
+              pathname.startsWith("/admin")
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground",
+            )}
+          >
+            <Shield size={17} />
+            Admin
+          </Link>
+        )}
         <Link
           to="/profile"
           className={cn(
@@ -62,6 +80,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <OfflineBanner />
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card/85 px-4 py-2 backdrop-blur-xl md:hidden">
           <BrandLogo size={28} />
           <Link

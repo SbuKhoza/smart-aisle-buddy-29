@@ -268,8 +268,8 @@ function ProductsTab() {
             <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
               <SelectTrigger className="h-9 text-[14px]"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map((c: any) => (
-                  <SelectItem key={c.id ?? c} value={c.id ?? c}>{c.label ?? c.name ?? c}</SelectItem>
+                {CATEGORIES.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
