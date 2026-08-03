@@ -51,6 +51,9 @@ export interface Store {
   name: string;
   logoURL?: string;
   country: string;
+  colour?: string;
+  initials?: string;
+  createdAt?: ISODate;
 }
 
 export interface Product {
@@ -60,6 +63,17 @@ export interface Product {
   category?: string;
   barcode?: string;
   imageURL?: string;
+  storeId?: ID;
+  storeName?: string;
+  unit?: string;
+  price?: number | null;
+  createdAt?: ISODate;
+}
+
+export interface AdminRecord {
+  userId: ID;
+  email?: string;
+  createdAt?: ISODate;
 }
 
 export interface Price {
@@ -110,11 +124,16 @@ export interface ShoppingItem {
 export interface Promotion {
   id: ID;
   storeId: ID;
+  storeName?: string;
   title: string;
+  tag?: string;
   description?: string;
   imageURL?: string;
+  active?: boolean;
   validFrom: ISODate;
   validTo: ISODate;
+  createdAt?: ISODate;
+  updatedAt?: ISODate;
 }
 
 export interface Catalogue {
