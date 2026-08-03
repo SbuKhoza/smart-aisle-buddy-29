@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -8,13 +7,14 @@ import {
   onSnapshot,
   orderBy,
   query,
-  serverTimestamp,
+  setDoc,
   updateDoc,
   where,
   writeBatch,
   type Unsubscribe,
 } from "firebase/firestore";
 import { getDb } from "../firebase";
+import { queueWrite } from "../offline";
 import type {
   ShoppingList,
   ShoppingItem,
@@ -68,7 +68,9 @@ export const shoppingListService = {
       mode?: "custom" | "store" | "combination";
     },
   ): Promise<string> {
-    const ref = await addDoc(collection(getDb(), LISTS), {
+    const ref = doc(collection(getDb(), LISTS));
+    queueWrite(setDoc(ref, {
+      id: ref.id,
       userId,
       name: name.trim(),
       status: "active",
@@ -82,24 +84,24 @@ export const shoppingListService = {
       mode: opts?.mode ?? "custom",
       createdAt: nowIso(),
       updatedAt: nowIso(),
-    });
+    }));
     return ref.id;
   },
 
   async rename(id: string, name: string) {
-    await updateDoc(doc(getDb(), LISTS, id), { name: name.trim(), updatedAt: nowIso() });
+    queueWrite(updateDoc(doc(getDb(), LISTS, id), { name: name.trim(), updatedAt: nowIso() }));
   },
 
   async setBudget(id: string, budget: number | null) {
-    await updateDoc(doc(getDb(), LISTS, id), { budget, updatedAt: nowIso() });
+    queueWrite(updateDoc(doc(getDb(), LISTS, id), { budget, updatedAt: nowIso() }));
   },
 
   async setStatus(id: string, status: ShoppingList["status"]) {
-    await updateDoc(doc(getDb(), LISTS, id), {
+    queueWrite(updateDoc(doc(getDb(), LISTS, id), {
       status,
       archived: status === "archived",
       updatedAt: nowIso(),
-    });
+    }));
   },
 
   async archive(id: string) {
@@ -118,7 +120,7 @@ export const shoppingListService = {
     const batch = writeBatch(getDb());
     itemsSnap.docs.forEach((d) => batch.delete(d.ref));
     batch.delete(doc(getDb(), LISTS, id));
-    await batch.commit();
+    queueWrite(batch.commit());
   },
 
   async duplicate(userId: string, sourceId: string, newName?: string): Promise<string> {
@@ -149,12 +151,12 @@ export const shoppingListService = {
   },
 
   async updateTotals(id: string, itemCount: number, estimatedTotal: number, actualTotal: number) {
-    await updateDoc(doc(getDb(), LISTS, id), {
+    queueWrite(updateDoc(doc(getDb(), LISTS, id), {
       itemCount,
       estimatedTotal,
       actualTotal,
       updatedAt: nowIso(),
-    });
+    }));
   },
 };
 
@@ -208,7 +210,9 @@ export const shoppingItemService = {
   },
 
   async add(userId: string, listId: string, input: NewItemInput): Promise<string> {
-    const ref = await addDoc(collection(getDb(), ITEMS), {
+    const ref = doc(collection(getDb(), ITEMS));
+    queueWrite(setDoc(ref, {
+      id: ref.id,
       userId,
       listId,
       productId: input.productId ?? null,
@@ -226,7 +230,7 @@ export const shoppingItemService = {
       notes: input.notes ?? null,
       order: Date.now(),
       createdAt: nowIso(),
-    });
+    }));
     return ref.id;
   },
 
@@ -255,23 +259,23 @@ export const shoppingItemService = {
         createdAt: nowIso(),
       });
     });
-    await batch.commit();
+    queueWrite(batch.commit());
   },
 
   async update(id: string, patch: Partial<ShoppingItem>) {
-    await updateDoc(doc(getDb(), ITEMS, id), patch as any);
+    queueWrite(updateDoc(doc(getDb(), ITEMS, id), patch as any));
   },
 
   async togglePurchased(id: string, purchased: boolean) {
-    await updateDoc(doc(getDb(), ITEMS, id), { purchased });
+    queueWrite(updateDoc(doc(getDb(), ITEMS, id), { purchased }));
   },
 
   async setActualPrice(id: string, price: number | null) {
-    await updateDoc(doc(getDb(), ITEMS, id), { actualPrice: price });
+    queueWrite(updateDoc(doc(getDb(), ITEMS, id), { actualPrice: price }));
   },
 
   async remove(id: string) {
-    await deleteDoc(doc(getDb(), ITEMS, id));
+    queueWrite(deleteDoc(doc(getDb(), ITEMS, id)));
   },
 };
 
@@ -318,7 +322,9 @@ export const historyService = {
       (s, i) => s + (Number(i.actualPrice ?? i.estimatedPrice) || 0) * (Number(i.quantity) || 0),
       0,
     );
-    const ref = await addDoc(collection(getDb(), HISTORY), {
+    const ref = doc(collection(getDb(), HISTORY));
+    queueWrite(setDoc(ref, {
+      id: ref.id,
       userId,
       listId: input.listId,
       name: input.name,
@@ -342,14 +348,14 @@ export const historyService = {
         actualPrice: i.actualPrice ?? null,
         purchased: !!i.purchased,
       })),
-    });
+    }));
     // Mark list completed
     await shoppingListService.setStatus(input.listId, "completed");
     return ref.id;
   },
 
   async remove(id: string) {
-    await deleteDoc(doc(getDb(), HISTORY, id));
+    queueWrite(deleteDoc(doc(getDb(), HISTORY, id)));
   },
 
   async duplicateToList(userId: string, tripId: string): Promise<string> {
@@ -413,11 +419,8 @@ export const favouriteService = {
       ),
     );
     if (!existing.empty) return existing.docs[0].id;
-    const ref = await addDoc(collection(getDb(), FAVS), {
-      ...fav,
-      userId,
-      addedAt: nowIso(),
-    });
+    const ref = doc(collection(getDb(), FAVS));
+    queueWrite(setDoc(ref, { ...fav, id: ref.id, userId, addedAt: nowIso() }));
     return ref.id;
   },
 
@@ -429,11 +432,11 @@ export const favouriteService = {
         where("productId", "==", productId),
       ),
     );
-    await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+    snap.docs.forEach((d) => queueWrite(deleteDoc(d.ref)));
   },
 
   async remove(id: string) {
-    await deleteDoc(doc(getDb(), FAVS, id));
+    queueWrite(deleteDoc(doc(getDb(), FAVS, id)));
   },
 };
 
@@ -493,16 +496,15 @@ export const userProductService = {
       createdAt: nowIso(),
     };
 
-    const ref = await addDoc(
-      collection(getDb(), USER_PRODUCTS),
-      data
-    );
+    const ref = doc(collection(getDb(), USER_PRODUCTS));
+
+    queueWrite(setDoc(ref, { ...data, id: ref.id }));
 
     return ref.id;
   },
 
   async remove(id: string) {
-    await deleteDoc(doc(getDb(), USER_PRODUCTS, id));
+    queueWrite(deleteDoc(doc(getDb(), USER_PRODUCTS, id)));
   },
 };
 

@@ -1,10 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { LogOut, Trash2, Bell, MapPin, Shield, Moon, Languages } from "lucide-react";
+import { LogOut, Trash2, Bell, MapPin, Shield, Moon, Languages, ShieldCheck, ChevronRight } from "lucide-react";
 import { deleteUser } from "firebase/auth";
 import { useAuth } from "@/lib/firebase-auth";
 import { useTheme, type ThemeMode } from "@/lib/theme";
+import { useIsAdmin } from "@/lib/use-admin";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ function SettingsPage() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { mode, isDark, setMode } = useTheme();
+  const { isAdmin } = useIsAdmin();
   const [notif, setNotif] = useState({ promos: true, drops: true, digest: false });
   const [loc, setLoc] = useState(false);
   const [analytics, setAnalytics] = useState(true);
@@ -102,6 +104,20 @@ function SettingsPage() {
         <Row icon={<Shield size={16} />} title="Analytics" desc="Help us improve AISLE SPY" right={<Switch checked={analytics} onCheckedChange={setAnalytics} />} />
         <Row icon={<Languages size={16} />} title="Language" desc="Coming soon" right={<span className="text-xs text-muted-foreground">English</span>} />
       </Card>
+
+      {isAdmin && (
+        <Card className="mt-3 gap-0 rounded-2xl border-border px-3 py-1 shadow-[var(--shadow-card)]">
+          <p className="px-1 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Admin</p>
+          <Link to="/admin" className="block active:opacity-70">
+            <Row
+              icon={<ShieldCheck size={16} />}
+              title="Admin dashboard"
+              desc="Manage stores, products and specials"
+              right={<ChevronRight size={16} className="text-muted-foreground" />}
+            />
+          </Link>
+        </Card>
+      )}
 
       <Card className="mt-3 gap-0 rounded-2xl border-border p-3 shadow-[var(--shadow-card)]">
         <p className="px-1 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Account</p>

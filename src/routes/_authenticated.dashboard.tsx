@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ListChecks, Clock, Wallet, Plus, ShoppingCart, ChevronRight, Leaf, ClipboardList } from "lucide-react";
 import { useAuth } from "@/lib/firebase-auth";
 import { historyService, shoppingListService } from "@/lib/services/shopping";
+import { isPromotionLive, promotionsService } from "@/lib/services/admin";
+import type { Promotion } from "@/models";
 import type { ShoppingHistoryEntry, ShoppingList } from "@/models";
 import { DEFAULT_STORES } from "@/constants/regions";
 import { Card } from "@/components/ui/card";
@@ -32,7 +34,7 @@ function greeting() {
   return "Good evening";
 }
 
-// TODO: replace with a real specials/adverts service once available.
+// Fallback shown only until an admin publishes real specials.
 const PLACEHOLDER_SPECIALS = [
   { id: "s1", storeId: "shoprite", storeName: "Shoprite", tag: "Limited time only", title: "Extra 15% off fresh spreads" },
   { id: "s2", storeId: "checkers", storeName: "Checkers", tag: "This week", title: "Sixty60 delivery specials" },
@@ -160,6 +162,7 @@ function Dashboard() {
   const [trips, setTrips] = useState<ShoppingHistoryEntry[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedStore, setSelectedStore] = useState<string | null>(DEFAULT_STORES[0]?.id ?? null);
+  const [promos, setPromos] = useState<Promotion[]>([]);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [specialIndex, setSpecialIndex] = useState(0);
 
@@ -169,6 +172,20 @@ function Dashboard() {
     const u2 = historyService.subscribe(user.uid, setTrips);
     return () => { u1(); u2(); };
   }, [user]);
+
+  useEffect(() => promotionsService.subscribeAll(setPromos, () => {}), []);
+
+  const specials = useMemo(() => {
+    const live = promos.filter((p) => isPromotionLive(p));
+    if (!live.length) return PLACEHOLDER_SPECIALS;
+    return live.map((p) => ({
+      id: p.id,
+      storeId: p.storeId,
+      storeName: p.storeName || "Store",
+      tag: p.tag || "Special",
+      title: p.title,
+    }));
+  }, [promos]);
 
   const monthlySpent = useMemo(() => {
     const now = new Date();
@@ -221,7 +238,7 @@ function Dashboard() {
           className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1"
           style={{ scrollbarWidth: "none" }}
         >
-          {PLACEHOLDER_SPECIALS.map((s) => {
+          {specials.map((s) => {
             const style = STORE_STYLE[s.storeId] ?? { bg: "#64748B", text: "#fff", initials: s.storeName.slice(0, 2).toUpperCase() };
             return (
               <button
@@ -330,7 +347,7 @@ function Dashboard() {
           })}
         </div>
         <div className="mt-2 flex justify-center gap-1">
-          {PLACEHOLDER_SPECIALS.map((_, i) => (
+          {specials.map((_, i) => (
             <span
               key={i}
               className={cn(
