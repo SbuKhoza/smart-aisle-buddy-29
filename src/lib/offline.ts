@@ -14,7 +14,9 @@ function emit() {
 
 export function subscribePending(l: Listener) {
   listeners.add(l);
-  return () => listeners.delete(l);
+  return () => {
+    listeners.delete(l);
+  };
 }
 
 export function getPendingCount() {
