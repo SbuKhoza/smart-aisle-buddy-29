@@ -19,6 +19,8 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedShoppingListsRouteImport } from './routes/_authenticated.shopping-lists'
 import { Route as AuthenticatedSpecialsRouteImport } from './routes/_authenticated.specials'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
@@ -78,6 +80,16 @@ const AuthenticatedSpecialsRoute = AuthenticatedSpecialsRouteImport.update({
   path: '/specials',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/auth/forgot-password',
   path: '/auth/forgot-password',
@@ -134,9 +146,11 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/shopping-lists': typeof AuthenticatedShoppingListsRouteWithChildren
   '/specials': typeof AuthenticatedSpecialsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/admin/': typeof AdminIndexRoute
   '/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
   '/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
   '/history/': typeof AuthenticatedHistoryIndexRoute
@@ -146,11 +160,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AdminIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/specials': typeof AuthenticatedSpecialsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -172,9 +187,11 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/shopping-lists': typeof AuthenticatedShoppingListsRouteWithChildren
   '/_authenticated/specials': typeof AuthenticatedSpecialsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/admin/': typeof AdminIndexRoute
   '/_authenticated/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
   '/_authenticated/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
   '/_authenticated/history/': typeof AuthenticatedHistoryIndexRoute
@@ -193,9 +210,11 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shopping-lists'
     | '/specials'
+    | '/admin/login'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
+    | '/admin/'
     | '/history/$tripId'
     | '/shopping-lists/$listId'
     | '/history/'
@@ -210,6 +229,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/specials'
+    | '/admin/login'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -230,9 +250,11 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/shopping-lists'
     | '/_authenticated/specials'
+    | '/admin/login'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
+    | '/admin/'
     | '/_authenticated/history/$tripId'
     | '/_authenticated/shopping-lists/$listId'
     | '/_authenticated/history/'
@@ -244,9 +266,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -320,6 +344,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/specials'
       preLoaderRoute: typeof AuthenticatedSpecialsRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/forgot-password': {
       id: '/auth/forgot-password'
@@ -453,9 +491,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

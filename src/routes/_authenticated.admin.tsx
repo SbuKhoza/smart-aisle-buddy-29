@@ -74,7 +74,7 @@ function AdminPage() {
     <div className="mx-auto w-full max-w-4xl px-4 py-6 md:px-8 md:py-10">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
         <h1 className="text-[22px] font-bold tracking-tight text-secondary">Admin</h1>
-        <p className="text-[13px] text-muted-foreground">Manage stores, products and specials.</p>
+        <p className="text-[19px] text-muted-foreground">Manage stores, products and specials.</p>
       </motion.div>
 
       <Tabs defaultValue="stores">
