@@ -64,7 +64,7 @@ function TripPage() {
           <Card className="col-span-2 rounded-3xl border-border p-4">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">Budget R {trip.budget.toLocaleString()}</p>
-              <p className={"text-xs font-semibold " + (overBudget ? "text-red-600" : "text-emerald-600")}>
+              <p className={"text-xs font-semibold " + (overBudget ? "text-destructive" : "text-secondary")}>
                 {overBudget
                   ? `R ${Math.round(Math.abs(trip.budget - (trip.actualTotal ?? 0))).toLocaleString()} over`
                   : `R ${Math.round(trip.budget - (trip.actualTotal ?? 0)).toLocaleString()} left`}
@@ -94,7 +94,7 @@ function TripPage() {
                 {i.actualPrice != null ? ` · Actual R ${i.actualPrice}` : ""}
               </p>
             </div>
-            <span className={"text-xs font-medium " + (i.purchased ? "text-emerald-600" : "text-muted-foreground")}>
+            <span className={"text-xs font-medium " + (i.purchased ? "text-secondary" : "text-muted-foreground")}>
               {i.purchased ? "Bought" : "Missed"}
             </span>
           </div>

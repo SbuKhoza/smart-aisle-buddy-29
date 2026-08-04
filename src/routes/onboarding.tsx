@@ -82,12 +82,40 @@ function OnboardingPage() {
     }
   };
 
+  const skipAll = async () => {
+    setBusy(true);
+    try {
+      await saveProfile({
+        country: country || "ZA",
+        favouriteStores,
+        onboardingComplete: true,
+      });
+      navigate({ to: "/dashboard", replace: true });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Could not skip setup");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent px-4 py-8">
       <div className="mx-auto flex w-full max-w-lg flex-col">
         <header className="mb-6 flex items-center justify-between">
           <BrandLogo size={32} />
-          <span className="text-xs font-medium text-muted-foreground">Step {step} of {TOTAL_STEPS}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-medium text-muted-foreground">Step {step} of {TOTAL_STEPS}</span>
+            {step < TOTAL_STEPS && (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={skipAll}
+                className="text-xs font-semibold text-secondary underline-offset-2 hover:underline disabled:opacity-50"
+              >
+                Skip
+              </button>
+            )}
+          </div>
         </header>
 
         <div className="mb-6 h-1.5 w-full overflow-hidden rounded-full bg-accent">
