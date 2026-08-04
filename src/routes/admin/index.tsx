@@ -6,7 +6,18 @@ import { toast } from "sonner";
 import { signOut } from "firebase/auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-// ...(keep all your existing imports: Input, Label, Switch, Tabs, Select, CATEGORIES, types, FullScreenLoader)
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useIsAdmin } from "@/lib/use-admin";
 import { useAuth } from "@/lib/firebase-auth";
 import { getFirebaseAuth } from "@/lib/firebase";
