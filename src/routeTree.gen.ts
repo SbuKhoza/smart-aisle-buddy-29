@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated.history'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
@@ -43,11 +42,6 @@ const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -139,7 +133,6 @@ const AuthenticatedShoppingListsListIdShopRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
@@ -160,7 +153,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
-  '/admin': typeof AdminIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -169,6 +161,7 @@ export interface FileRoutesByTo {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/admin': typeof AdminIndexRoute
   '/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
   '/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
   '/history': typeof AuthenticatedHistoryIndexRoute
@@ -180,7 +173,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/onboarding': typeof OnboardingRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -203,7 +195,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/onboarding'
-    | '/admin'
     | '/dashboard'
     | '/history'
     | '/profile'
@@ -224,7 +215,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/onboarding'
-    | '/admin'
     | '/dashboard'
     | '/profile'
     | '/settings'
@@ -233,6 +223,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
+    | '/admin'
     | '/history/$tripId'
     | '/shopping-lists/$listId'
     | '/history'
@@ -243,7 +234,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/onboarding'
-    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/history'
     | '/_authenticated/profile'
@@ -295,13 +285,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -464,7 +447,6 @@ const AuthenticatedShoppingListsRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -474,7 +456,6 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
