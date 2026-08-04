@@ -342,7 +342,12 @@ export function AuthProvider({
       updatedAt: new Date().toISOString(),
     };
 
-    await setDoc(ref, merged, {
+    // Firestore rejects `undefined` values — strip them before writing.
+    const payload = Object.fromEntries(
+      Object.entries(merged).filter(([, v]) => v !== undefined),
+    );
+
+    await setDoc(ref, payload, {
       merge: true,
     });
 
