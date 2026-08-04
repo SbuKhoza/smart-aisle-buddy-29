@@ -522,10 +522,10 @@ export function budgetStatus(estimated: number, budget: number | null | undefine
 
 export function budgetColor(status: BudgetStatus): string {
   return status === "over"
-    ? "text-red-600"
+    ? "text-destructive"
     : status === "warn"
-      ? "text-orange-500"
-      : "text-emerald-600";
+      ? "text-muted-foreground"
+      : "text-secondary";
 }
 
 // ------------------------- Future-ready stubs -------------------------

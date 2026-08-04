@@ -39,19 +39,19 @@ export interface CategoryDef {
 }
 
 export const CATEGORIES: CategoryDef[] = [
-  { id: "bakery", label: "Bakery", icon: Croissant, color: "bg-amber-100", text: "text-amber-700" },
-  { id: "dairy", label: "Dairy", icon: Milk, color: "bg-sky-100", text: "text-sky-700" },
-  { id: "meat", label: "Meat", icon: Beef, color: "bg-rose-100", text: "text-rose-700" },
-  { id: "vegetables", label: "Vegetables", icon: Carrot, color: "bg-emerald-100", text: "text-emerald-700" },
-  { id: "fruit", label: "Fruit", icon: Apple, color: "bg-lime-100", text: "text-lime-700" },
-  { id: "frozen", label: "Frozen", icon: Snowflake, color: "bg-cyan-100", text: "text-cyan-700" },
-  { id: "cleaning", label: "Cleaning", icon: SprayCan, color: "bg-violet-100", text: "text-violet-700" },
-  { id: "baby", label: "Baby", icon: Baby, color: "bg-pink-100", text: "text-pink-700" },
-  { id: "beverages", label: "Beverages", icon: CupSoda, color: "bg-indigo-100", text: "text-indigo-700" },
-  { id: "snacks", label: "Snacks", icon: Cookie, color: "bg-orange-100", text: "text-orange-700" },
-  { id: "health", label: "Health", icon: HeartPulse, color: "bg-red-100", text: "text-red-700" },
-  { id: "pet", label: "Pet Food", icon: PawPrint, color: "bg-yellow-100", text: "text-yellow-700" },
-  { id: "other", label: "Other", icon: Package, color: "bg-slate-100", text: "text-slate-700" },
+  { id: "bakery", label: "Bakery", icon: Croissant, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "dairy", label: "Dairy", icon: Milk, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "meat", label: "Meat", icon: Beef, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "vegetables", label: "Vegetables", icon: Carrot, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "fruit", label: "Fruit", icon: Apple, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "frozen", label: "Frozen", icon: Snowflake, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "cleaning", label: "Cleaning", icon: SprayCan, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "baby", label: "Baby", icon: Baby, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "beverages", label: "Beverages", icon: CupSoda, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "snacks", label: "Snacks", icon: Cookie, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "health", label: "Health", icon: HeartPulse, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "pet", label: "Pet Food", icon: PawPrint, color: "bg-accent", text: "text-accent-foreground" },
+  { id: "other", label: "Other", icon: Package, color: "bg-accent", text: "text-accent-foreground" },
 ];
 
 export const CATEGORY_MAP: Record<CategoryId, CategoryDef> = Object.fromEntries(

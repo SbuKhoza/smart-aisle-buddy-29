@@ -54,7 +54,7 @@
 :root {
   --radius: 0.5rem;
 
-  /* ===== AISLE SPY — premium grocery light theme ===== */
+  /* ===== AISLE SPY — monochrome light theme ===== */
 
   /* App canvas: #F7F8FA */
   --background: oklch(0.985 0 0);
@@ -67,7 +67,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
 
-  /* Primary green: #16A34A */
+  /* Primary: black */
   --primary: oklch(0.16 0 0);
   --primary-foreground: oklch(1 0 0);
   --primary-glow: oklch(0.34 0 0);
