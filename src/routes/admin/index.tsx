@@ -115,9 +115,494 @@ function AdminPage() {
         </Button>
       </motion.div>
 
-      {/* ...keep your existing <Tabs> block with StoresTab / ProductsTab / SpecialsTab exactly as-is... */}
+      <Tabs defaultValue="stores">
+        <TabsList className="mb-4 grid w-full grid-cols-3">
+          <TabsTrigger value="stores" className="text-[13px]">
+            <StoreIcon size={14} className="mr-1.5" /> Stores
+          </TabsTrigger>
+          <TabsTrigger value="products" className="text-[13px]">
+            <Package size={14} className="mr-1.5" /> Products
+          </TabsTrigger>
+          <TabsTrigger value="specials" className="text-[13px]">
+            <Tag size={14} className="mr-1.5" /> Specials
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="stores">
+          <StoresTab />
+        </TabsContent>
+        <TabsContent value="products">
+          <ProductsTab />
+        </TabsContent>
+        <TabsContent value="specials">
+          <SpecialsTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
 
-/* Keep StoresTab, ProductsTab, SpecialsTab exactly as you already have them below this point. */
+function useStores() {
+  const [stores, setStores] = useState<Store[]>([]);
+  useEffect(() => adminStoreService.subscribe(setStores, () => {}), []);
+  return stores;
+}
+
+const emptyStore = { name: "", country: "ZA", colour: "#111111", logoURL: "", initials: "" };
+
+function StoresTab() {
+  const stores = useStores();
+  const [form, setForm] = useState<any>(emptyStore);
+  const editing = Boolean(form.id);
+
+  const save = () => {
+    if (!form.name.trim()) return toast.error("Store name is required");
+    adminStoreService.save({ ...form, name: form.name.trim() });
+    toast.success(editing ? "Store updated" : "Store added");
+    setForm(emptyStore);
+  };
+
+  return (
+    <div className="space-y-3">
+      <SectionCard>
+        <p className="mb-2.5 text-[13px] font-semibold text-secondary">
+          {editing ? "Edit store" : "Add store"}
+        </p>
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label className="text-[12px]">Name</Label>
+            <Input
+              className="h-9 text-[13px]"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Checkers"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Initials / short code</Label>
+            <Input
+              className="h-9 text-[13px]"
+              value={form.initials ?? ""}
+              onChange={(e) => setForm({ ...form, initials: e.target.value })}
+              placeholder="CHK"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Logo URL</Label>
+            <Input
+              className="h-9 text-[13px]"
+              value={form.logoURL ?? ""}
+              onChange={(e) => setForm({ ...form, logoURL: e.target.value })}
+              placeholder="https://…"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Brand colour</Label>
+            <Input
+              type="color"
+              className="h-9 w-full p-1"
+              value={form.colour ?? "#111111"}
+              onChange={(e) => setForm({ ...form, colour: e.target.value })}
+            />
+          </div>
+        </div>
+        <div className="mt-3 flex gap-2">
+          <Button size="sm" className="h-9 text-[13px]" onClick={save}>
+            <Plus size={14} className="mr-1.5" /> {editing ? "Save changes" : "Add store"}
+          </Button>
+          {editing && (
+            <Button size="sm" variant="ghost" className="h-9 text-[13px]" onClick={() => setForm(emptyStore)}>
+              <X size={14} className="mr-1.5" /> Cancel
+            </Button>
+          )}
+        </div>
+      </SectionCard>
+
+      {stores.length === 0 ? (
+        <p className="px-1 text-[13px] text-muted-foreground">No stores yet.</p>
+      ) : (
+        stores.map((s) => (
+          <SectionCard key={s.id}>
+            <div className="flex items-center gap-3">
+              <div
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[12px] font-bold text-primary-foreground"
+                style={{ background: s.colour || "var(--primary)" }}
+              >
+                {(s.initials || s.name || "?").slice(0, 3).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[14px] font-semibold text-secondary">{s.name}</p>
+                <p className="text-[12px] text-muted-foreground">{s.country || "ZA"}</p>
+              </div>
+              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setForm(s)}>
+                <Pencil size={14} />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 text-destructive"
+                onClick={() => {
+                  adminStoreService.remove(s.id);
+                  toast.success("Store removed");
+                }}
+              >
+                <Trash2 size={14} />
+              </Button>
+            </div>
+          </SectionCard>
+        ))
+      )}
+    </div>
+  );
+}
+
+const emptyProduct = {
+  name: "",
+  brand: "",
+  category: "other",
+  unit: "each",
+  price: "",
+  storeId: "",
+  imageURL: "",
+};
+
+function ProductsTab() {
+  const stores = useStores();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filter, setFilter] = useState<string>("all");
+  const [form, setForm] = useState<any>(emptyProduct);
+  const editing = Boolean(form.id);
+
+  useEffect(() => adminProductService.subscribe(setProducts, () => {}), []);
+
+  const rows = useMemo(
+    () => (filter === "all" ? products : products.filter((p) => p.storeId === filter)),
+    [products, filter],
+  );
+
+  const save = () => {
+    if (!form.name.trim()) return toast.error("Product name is required");
+    const store = stores.find((s) => s.id === form.storeId);
+    adminProductService.save({
+      ...form,
+      name: form.name.trim(),
+      storeName: store?.name ?? "",
+      price: form.price === "" ? null : Number(form.price),
+    });
+    toast.success(editing ? "Product updated" : "Product added");
+    setForm({ ...emptyProduct, storeId: form.storeId });
+  };
+
+  return (
+    <div className="space-y-3">
+      <SectionCard>
+        <p className="mb-2.5 text-[13px] font-semibold text-secondary">
+          {editing ? "Edit product" : "Add product"}
+        </p>
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label className="text-[12px]">Name</Label>
+            <Input
+              className="h-9 text-[13px]"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Full cream milk 2L"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Brand</Label>
+            <Input
+              className="h-9 text-[13px]"
+              value={form.brand ?? ""}
+              onChange={(e) => setForm({ ...form, brand: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Store</Label>
+            <Select value={form.storeId || undefined} onValueChange={(v) => setForm({ ...form, storeId: v })}>
+              <SelectTrigger className="h-9 text-[13px]">
+                <SelectValue placeholder="Select store" />
+              </SelectTrigger>
+              <SelectContent>
+                {stores.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Category</Label>
+            <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+              <SelectTrigger className="h-9 text-[13px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Unit</Label>
+            <Input
+              className="h-9 text-[13px]"
+              value={form.unit ?? ""}
+              onChange={(e) => setForm({ ...form, unit: e.target.value })}
+              placeholder="each / kg / 2L"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Price (R)</Label>
+            <Input
+              className="h-9 text-[13px]"
+              inputMode="decimal"
+              value={form.price ?? ""}
+              onChange={(e) => setForm({ ...form, price: e.target.value.replace(/[^0-9.]/g, "") })}
+            />
+          </div>
+        </div>
+        <div className="mt-3 flex gap-2">
+          <Button size="sm" className="h-9 text-[13px]" onClick={save}>
+            <Plus size={14} className="mr-1.5" /> {editing ? "Save changes" : "Add product"}
+          </Button>
+          {editing && (
+            <Button size="sm" variant="ghost" className="h-9 text-[13px]" onClick={() => setForm(emptyProduct)}>
+              <X size={14} className="mr-1.5" /> Cancel
+            </Button>
+          )}
+        </div>
+      </SectionCard>
+
+      <div className="flex items-center gap-2 px-1">
+        <span className="text-[12px] text-muted-foreground">Filter</span>
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="h-8 w-48 text-[12px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All stores</SelectItem>
+            {stores.map((s) => (
+              <SelectItem key={s.id} value={s.id}>
+                {s.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {rows.length === 0 ? (
+        <p className="px-1 text-[13px] text-muted-foreground">No products yet.</p>
+      ) : (
+        rows.map((p) => (
+          <SectionCard key={p.id}>
+            <div className="flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[14px] font-semibold text-secondary">{p.name}</p>
+                <p className="truncate text-[12px] text-muted-foreground">
+                  {[p.brand, p.storeName, p.unit].filter(Boolean).join(" · ") || "—"}
+                </p>
+              </div>
+              <span className="text-[13px] font-semibold text-secondary">
+                {p.price != null ? `R${Number(p.price).toFixed(2)}` : "—"}
+              </span>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => setForm({ ...p, price: p.price ?? "" })}
+              >
+                <Pencil size={14} />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 text-destructive"
+                onClick={() => {
+                  adminProductService.remove(p.id);
+                  toast.success("Product removed");
+                }}
+              >
+                <Trash2 size={14} />
+              </Button>
+            </div>
+          </SectionCard>
+        ))
+      )}
+    </div>
+  );
+}
+
+const emptyPromo = {
+  title: "",
+  tag: "Special",
+  description: "",
+  imageURL: "",
+  storeId: "",
+  active: true,
+  validFrom: today(),
+  validTo: inDays(14),
+};
+
+function SpecialsTab() {
+  const stores = useStores();
+  const [promos, setPromos] = useState<Promotion[]>([]);
+  const [form, setForm] = useState<any>(emptyPromo);
+  const editing = Boolean(form.id);
+
+  useEffect(() => promotionsService.subscribeAll(setPromos, () => {}), []);
+
+  const save = () => {
+    if (!form.title.trim()) return toast.error("Title is required");
+    const store = stores.find((s) => s.id === form.storeId);
+    promotionsService.save({
+      ...form,
+      title: form.title.trim(),
+      storeName: store?.name ?? "",
+    });
+    toast.success(editing ? "Special updated" : "Special added to the carousel");
+    setForm(emptyPromo);
+  };
+
+  return (
+    <div className="space-y-3">
+      <SectionCard>
+        <p className="mb-0.5 text-[13px] font-semibold text-secondary">
+          {editing ? "Edit special" : "Add special / advert"}
+        </p>
+        <p className="mb-2.5 text-[12px] text-muted-foreground">
+          Active specials appear in the dashboard carousel and on the Specials page.
+        </p>
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label className="text-[12px]">Title</Label>
+            <Input
+              className="h-9 text-[13px]"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder="30% off fresh produce"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Badge</Label>
+            <Input
+              className="h-9 text-[13px]"
+              value={form.tag ?? ""}
+              onChange={(e) => setForm({ ...form, tag: e.target.value })}
+              placeholder="Special / Advert / Deal"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Store</Label>
+            <Select value={form.storeId || undefined} onValueChange={(v) => setForm({ ...form, storeId: v })}>
+              <SelectTrigger className="h-9 text-[13px]">
+                <SelectValue placeholder="Select store" />
+              </SelectTrigger>
+              <SelectContent>
+                {stores.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Image URL (advert artwork)</Label>
+            <Input
+              className="h-9 text-[13px]"
+              value={form.imageURL ?? ""}
+              onChange={(e) => setForm({ ...form, imageURL: e.target.value })}
+              placeholder="https://…"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Valid from</Label>
+            <Input
+              type="date"
+              className="h-9 text-[13px]"
+              value={form.validFrom}
+              onChange={(e) => setForm({ ...form, validFrom: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Valid to</Label>
+            <Input
+              type="date"
+              className="h-9 text-[13px]"
+              value={form.validTo}
+              onChange={(e) => setForm({ ...form, validTo: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-[12px]">Description</Label>
+            <Textarea
+              className="min-h-16 text-[13px]"
+              value={form.description ?? ""}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+          </div>
+        </div>
+        <div className="mt-3 flex items-center gap-3">
+          <Button size="sm" className="h-9 text-[13px]" onClick={save}>
+            <Plus size={14} className="mr-1.5" /> {editing ? "Save changes" : "Add special"}
+          </Button>
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={form.active !== false}
+              onCheckedChange={(v) => setForm({ ...form, active: v })}
+            />
+            <span className="text-[12px] text-muted-foreground">Active</span>
+          </div>
+          {editing && (
+            <Button size="sm" variant="ghost" className="h-9 text-[13px]" onClick={() => setForm(emptyPromo)}>
+              <X size={14} className="mr-1.5" /> Cancel
+            </Button>
+          )}
+        </div>
+      </SectionCard>
+
+      {promos.length === 0 ? (
+        <p className="px-1 text-[13px] text-muted-foreground">No specials yet.</p>
+      ) : (
+        promos.map((p) => (
+          <SectionCard key={p.id}>
+            <div className="flex items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <span className="inline-flex rounded-full bg-accent px-2 py-0.5 text-[11px] font-semibold text-accent-foreground">
+                  {p.tag || "Special"}
+                </span>
+                <p className="mt-1.5 truncate text-[14px] font-semibold text-secondary">{p.title}</p>
+                <p className="truncate text-[12px] text-muted-foreground">
+                  {[p.storeName, `${p.validFrom} → ${p.validTo}`].filter(Boolean).join(" · ")}
+                </p>
+              </div>
+              <Switch
+                checked={p.active !== false}
+                onCheckedChange={(v) => promotionsService.setActive(p.id, v)}
+              />
+              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setForm(p)}>
+                <Pencil size={14} />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 text-destructive"
+                onClick={() => {
+                  promotionsService.remove(p.id);
+                  toast.success("Special removed");
+                }}
+              >
+                <Trash2 size={14} />
+              </Button>
+            </div>
+          </SectionCard>
+        ))
+      )}
+    </div>
+  );
+}
