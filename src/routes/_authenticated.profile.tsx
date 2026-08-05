@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { COUNTRIES, DEFAULT_STORES, SA_PROVINCES } from "@/constants/regions";
+import { COUNTRIES, SA_PROVINCES } from "@/constants/regions";
+import { useStores } from "@/lib/catalog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { ShoppingStyle } from "@/models";
@@ -139,7 +140,10 @@ function ProfilePage() {
         <div className="mt-6">
           <Label className="mb-2 block">Favourite stores</Label>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
-            {DEFAULT_STORES.map((s) => {
+            {stores.length === 0 && (
+              <p className="col-span-full text-[13px] text-muted-foreground">No stores available yet.</p>
+            )}
+            {stores.map((s) => {
               const active = form.favouriteStores.includes(s.id);
               return (
                 <button
