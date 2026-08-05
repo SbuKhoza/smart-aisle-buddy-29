@@ -7,7 +7,7 @@ import { ArrowLeft, Pencil, Store, Layers, ChevronRight, Check } from "lucide-re
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { DEFAULT_STORES } from "@/constants/regions";
+import { useStores } from "@/lib/catalog";
 
 export type CreateListMode = "custom" | "store" | "combination";
 
@@ -62,7 +62,8 @@ export function CreateListDialog({
   const [step, setStep] = useState<"mode" | "details">("mode");
   const [mode, setMode] = useState<CreateListMode>("custom");
   const [name, setName] = useState("");
-  const [storeIds, setStoreIds] = useState<string[]>([DEFAULT_STORES[0].id]);
+  const stores = useStores();
+  const [storeIds, setStoreIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -70,9 +71,9 @@ export function CreateListDialog({
       setStep("mode");
       setMode("custom");
       setName("");
-      setStoreIds([DEFAULT_STORES[0].id]);
+      setStoreIds(stores[0] ? [stores[0].id] : []);
     }
-  }, [open]);
+  }, [open, stores]);
 
   function pickMode(m: CreateListMode) {
     setMode(m);
@@ -81,7 +82,7 @@ export function CreateListDialog({
         m === "custom"
           ? "Quick list"
           : m === "store"
-            ? `${DEFAULT_STORES.find((s) => s.id === storeIds[0])?.name ?? "Store"} run`
+            ? `${stores.find((s) => s.id === storeIds[0])?.name ?? "Store"} run`
             : "Weekly shop",
       );
     }
@@ -109,7 +110,7 @@ export function CreateListDialog({
     if (n.length > 60) return toast.error("Name is too long");
     setBusy(true);
     try {
-      const selected = DEFAULT_STORES.filter((s) => storeIds.includes(s.id));
+      const selected = stores.filter((s) => storeIds.includes(s.id));
       if (mode === "combination") {
         await onCreate({
           name: n,
@@ -201,7 +202,12 @@ export function CreateListDialog({
                 <div className="space-y-1.5">
                   <Label>{mode === "combination" ? "Stores" : "Store"}</Label>
                   <div className="flex flex-wrap gap-1.5">
-                    {DEFAULT_STORES.map((s) => {
+                    {stores.length === 0 && (
+                      <p className="text-[11px] text-muted-foreground">
+                        No stores yet — an admin still needs to add them.
+                      </p>
+                    )}
+                    {stores.map((s) => {
                       const selected = storeIds.includes(s.id);
                       return (
                         <button

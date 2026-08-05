@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { COUNTRIES, DEFAULT_STORES, SA_PROVINCES } from "@/constants/regions";
+import { COUNTRIES, SA_PROVINCES } from "@/constants/regions";
+import { useStores } from "@/lib/catalog";
 import { locationService } from "@/lib/services";
 import { cn } from "@/lib/utils";
 import type { ShoppingStyle } from "@/models";
@@ -35,6 +36,7 @@ function OnboardingPage() {
   const [province, setProvince] = useState<string | undefined>();
   const [locationGranted, setLocationGranted] = useState(false);
   const [favouriteStores, setFavouriteStores] = useState<string[]>([]);
+  const stores = useStores();
   const [shoppingStyle, setShoppingStyle] = useState<ShoppingStyle | undefined>();
   const [budget, setBudget] = useState<string>("");
   const [household, setHousehold] = useState<string>("");
@@ -194,7 +196,12 @@ function OnboardingPage() {
                 <h2 className="text-xl font-bold text-secondary">Favourite stores</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Pick the shops you visit most often.</p>
                 <div className="mt-5 grid grid-cols-2 gap-2">
-                  {DEFAULT_STORES.map((s) => {
+                  {stores.length === 0 && (
+                    <p className="col-span-2 text-sm text-muted-foreground">
+                      No stores available yet. You can skip this step and set favourites later.
+                    </p>
+                  )}
+                  {stores.map((s) => {
                     const active = favouriteStores.includes(s.id);
                     return (
                       <button

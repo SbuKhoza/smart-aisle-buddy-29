@@ -7,7 +7,7 @@ import { historyService, shoppingListService } from "@/lib/services/shopping";
 import { isPromotionLive, promotionsService } from "@/lib/services/admin";
 import type { Promotion } from "@/models";
 import type { ShoppingHistoryEntry, ShoppingList } from "@/models";
-import { DEFAULT_STORES } from "@/constants/regions";
+import { useStores } from "@/lib/catalog";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreateListDialog, type CreateListInput } from "@/components/shopping/CreateListDialog";
@@ -34,15 +34,7 @@ function greeting() {
   return "Good evening";
 }
 
-// Fallback shown only until an admin publishes real specials.
-const PLACEHOLDER_SPECIALS = [
-  { id: "s1", storeId: "shoprite", storeName: "Shoprite", tag: "Limited time only", title: "Extra 15% off fresh spreads" },
-  { id: "s2", storeId: "checkers", storeName: "Checkers", tag: "This week", title: "Sixty60 delivery specials" },
-  { id: "s3", storeId: "woolworths", storeName: "Woolworths", tag: "Today only", title: "2-for-1 on ready meals" },
-  { id: "s4", storeId: "picknpay", storeName: "Pick n Pay", tag: "Members", title: "Smart Shopper double points" },
-  { id: "s5", storeId: "spar", storeName: "Spar", tag: "Weekend", title: "Braai bundle deals" },
-];
-
+// Store branding fallback for legacy ids; admin-managed colours take priority.
 const STORE_STYLE: Record<string, { bg: string; text: string; initials: string }> = {
   shoprite: { bg: "#E31E24", text: "#fff", initials: "SR" },
   checkers: { bg: "#3B6FD4", text: "#fff", initials: "CH" },
@@ -161,7 +153,8 @@ function Dashboard() {
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [trips, setTrips] = useState<ShoppingHistoryEntry[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
-  const [selectedStore, setSelectedStore] = useState<string | null>(DEFAULT_STORES[0]?.id ?? null);
+  const stores = useStores();
+  const [selectedStore, setSelectedStore] = useState<string | null>(null);
   const [promos, setPromos] = useState<Promotion[]>([]);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [specialIndex, setSpecialIndex] = useState(0);
@@ -177,7 +170,6 @@ function Dashboard() {
 
   const specials = useMemo(() => {
     const live = promos.filter((p) => isPromotionLive(p));
-    if (!live.length) return PLACEHOLDER_SPECIALS;
     return live.map((p) => ({
       id: p.id,
       storeId: p.storeId,
@@ -230,7 +222,8 @@ function Dashboard() {
         </h1>
       </motion.div>
 
-      {/* Specials & adverts carousel — single dark surface per spec */}
+      {/* Specials & adverts carousel — admin managed */}
+      {specials.length > 0 && (
       <div className="mb-4">
         <div
           ref={carouselRef}
@@ -358,6 +351,7 @@ function Dashboard() {
           ))}
         </div>
       </div>
+      )}
 
       {/* Budget card — mint surface, basket illustration */}
       {/* ==========================================================
@@ -518,8 +512,15 @@ function Dashboard() {
       {/* Store row — retailer branding kept only inside the logo, selection shown with a green ring */}
       <div className="mb-5">
         <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          {DEFAULT_STORES.map((s) => {
-            const style = STORE_STYLE[s.id] ?? { bg: "#64748B", text: "#fff", initials: s.name.slice(0, 2).toUpperCase() };
+          {stores.length === 0 && (
+            <p className="text-[12px] text-muted-foreground">Stores will appear here once an admin adds them.</p>
+          )}
+          {stores.map((s) => {
+            const style = {
+              bg: s.colour ?? STORE_STYLE[s.id]?.bg ?? "#64748B",
+              text: STORE_STYLE[s.id]?.text ?? "#fff",
+              initials: s.initials ?? STORE_STYLE[s.id]?.initials ?? s.name.slice(0, 2).toUpperCase(),
+            };
             const selected = selectedStore === s.id;
             return (
               <button

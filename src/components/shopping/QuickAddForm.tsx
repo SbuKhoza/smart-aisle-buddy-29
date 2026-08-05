@@ -3,7 +3,7 @@ import { Plus, Minus, CornerDownLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PRELOADED_PRODUCTS } from "@/data/preloaded-products";
+import { useCatalogProducts } from "@/lib/catalog";
 import type { UserProduct } from "@/models";
 
 export interface QuickAddPayload {
@@ -20,7 +20,7 @@ interface Suggestion {
   name: string;
   category: string;
   unit: string;
-  estimatedPrice: number;
+  estimatedPrice: number | null;
 }
 
 const MAX_QTY = 99;
@@ -40,6 +40,7 @@ export function QuickAddForm({
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState(1);
   const nameRef = useRef<HTMLInputElement>(null);
+  const catalogProducts = useCatalogProducts();
 
   const catalog = useMemo<Suggestion[]>(
     () => [
@@ -48,17 +49,17 @@ export function QuickAddForm({
         name: p.name,
         category: p.category,
         unit: p.defaultUnit,
-        estimatedPrice: p.estimatedPrice,
+        estimatedPrice: p.estimatedPrice as number | null,
       })),
-      ...PRELOADED_PRODUCTS.map((p) => ({
+      ...catalogProducts.map((p) => ({
         id: p.id,
         name: p.name,
-        category: p.category as string,
-        unit: p.unit,
-        estimatedPrice: p.estimatedPrice,
+        category: p.category ?? "other",
+        unit: p.unit ?? "pcs",
+        estimatedPrice: p.price ?? null,
       })),
     ],
-    [userProducts],
+    [userProducts, catalogProducts],
   );
 
   const term = name.trim().toLowerCase();
@@ -101,7 +102,7 @@ export function QuickAddForm({
     reset();
     await onAdd({
       name: s.name,
-      estimatedPrice: s.estimatedPrice,
+      estimatedPrice: s.estimatedPrice ?? null,
       quantity: qty,
       productId: s.id,
       category: s.category,
@@ -209,7 +210,9 @@ export function QuickAddForm({
                 className="flex w-full items-center gap-3 border-b border-border px-3 py-2 text-left last:border-b-0 active:bg-accent hover:bg-accent"
               >
                 <span className="min-w-0 flex-1 truncate text-[14px] text-secondary">{s.name}</span>
-                <span className="text-xs font-semibold text-primary">R {s.estimatedPrice}</span>
+                {s.estimatedPrice != null && (
+                  <span className="text-xs font-semibold text-primary">R {s.estimatedPrice}</span>
+                )}
                 <CornerDownLeft size={13} className="text-muted-foreground" />
               </button>
             ))}
