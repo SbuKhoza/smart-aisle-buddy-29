@@ -34,15 +34,7 @@ function greeting() {
   return "Good evening";
 }
 
-// Fallback shown only until an admin publishes real specials.
-const PLACEHOLDER_SPECIALS = [
-  { id: "s1", storeId: "shoprite", storeName: "Shoprite", tag: "Limited time only", title: "Extra 15% off fresh spreads" },
-  { id: "s2", storeId: "checkers", storeName: "Checkers", tag: "This week", title: "Sixty60 delivery specials" },
-  { id: "s3", storeId: "woolworths", storeName: "Woolworths", tag: "Today only", title: "2-for-1 on ready meals" },
-  { id: "s4", storeId: "picknpay", storeName: "Pick n Pay", tag: "Members", title: "Smart Shopper double points" },
-  { id: "s5", storeId: "spar", storeName: "Spar", tag: "Weekend", title: "Braai bundle deals" },
-];
-
+// Store branding fallback for legacy ids; admin-managed colours take priority.
 const STORE_STYLE: Record<string, { bg: string; text: string; initials: string }> = {
   shoprite: { bg: "#E31E24", text: "#fff", initials: "SR" },
   checkers: { bg: "#3B6FD4", text: "#fff", initials: "CH" },
@@ -178,7 +170,6 @@ function Dashboard() {
 
   const specials = useMemo(() => {
     const live = promos.filter((p) => isPromotionLive(p));
-    if (!live.length) return PLACEHOLDER_SPECIALS;
     return live.map((p) => ({
       id: p.id,
       storeId: p.storeId,
