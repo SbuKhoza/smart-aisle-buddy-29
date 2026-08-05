@@ -222,7 +222,8 @@ function Dashboard() {
         </h1>
       </motion.div>
 
-      {/* Specials & adverts carousel — single dark surface per spec */}
+      {/* Specials & adverts carousel — admin managed */}
+      {specials.length > 0 && (
       <div className="mb-4">
         <div
           ref={carouselRef}
@@ -350,6 +351,7 @@ function Dashboard() {
           ))}
         </div>
       </div>
+      )}
 
       {/* Budget card — mint surface, basket illustration */}
       {/* ==========================================================
