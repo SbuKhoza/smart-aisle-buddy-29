@@ -295,16 +295,6 @@ function parseCsv(text: string): Record<string, string>[] {
   });
 }
 
-const _emptyProductUnused = {
-  name: "",
-  brand: "",
-  category: "other",
-  unit: "each",
-  price: "",
-  storeId: "",
-  imageURL: "",
-};
-
 function ProductsTab() {
   const stores = useStores();
   const [products, setProducts] = useState<Product[]>([]);
