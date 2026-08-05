@@ -266,6 +266,45 @@ const emptyProduct = {
   imageURL: "",
 };
 
+/** Minimal CSV parser supporting quoted fields; returns lowercase-keyed rows. */
+function parseCsv(text: string): Record<string, string>[] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let quoted = false;
+  const src = text.replace(/\r\n?/g, "\n");
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (quoted) {
+      if (ch === '"') {
+        if (src[i + 1] === '"') { cell += '"'; i++; } else quoted = false;
+      } else cell += ch;
+    } else if (ch === '"') quoted = true;
+    else if (ch === ",") { row.push(cell); cell = ""; }
+    else if (ch === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; }
+    else cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  const filled = rows.filter((r) => r.some((c) => c.trim() !== ""));
+  if (filled.length < 2) return [];
+  const headers = filled[0].map((h) => h.trim().toLowerCase().replace(/\s+/g, ""));
+  return filled.slice(1).map((r) => {
+    const o: Record<string, string> = {};
+    headers.forEach((h, i) => (o[h] = (r[i] ?? "").trim()));
+    return o;
+  });
+}
+
+const _emptyProductUnused = {
+  name: "",
+  brand: "",
+  category: "other",
+  unit: "each",
+  price: "",
+  storeId: "",
+  imageURL: "",
+};
+
 function ProductsTab() {
   const stores = useStores();
   const [products, setProducts] = useState<Product[]>([]);
