@@ -36,6 +36,7 @@ function OnboardingPage() {
   const [province, setProvince] = useState<string | undefined>();
   const [locationGranted, setLocationGranted] = useState(false);
   const [favouriteStores, setFavouriteStores] = useState<string[]>([]);
+  const stores = useStores();
   const [shoppingStyle, setShoppingStyle] = useState<ShoppingStyle | undefined>();
   const [budget, setBudget] = useState<string>("");
   const [household, setHousehold] = useState<string>("");
