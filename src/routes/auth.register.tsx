@@ -41,6 +41,8 @@ export const Route = createFileRoute("/auth/register")({
 function RegisterPage() {
   const { register: doRegister, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const {
     register,
     handleSubmit,
