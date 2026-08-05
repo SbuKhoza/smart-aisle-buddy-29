@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Store as StoreIcon, Package, Tag, Trash2, ShieldAlert, Pencil, X, LogOut } from "lucide-react";
+import { Plus, Store as StoreIcon, Package, Tag, Trash2, ShieldAlert, Pencil, X, LogOut, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { signOut } from "firebase/auth";
 import { Card } from "@/components/ui/card";
@@ -271,6 +271,7 @@ function ProductsTab() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [form, setForm] = useState<any>(emptyProduct);
+  const [importing, setImporting] = useState(false);
   const editing = Boolean(form.id);
 
   useEffect(() => adminProductService.subscribe(setProducts, () => {}), []);
@@ -293,8 +294,77 @@ function ProductsTab() {
     setForm({ ...emptyProduct, storeId: form.storeId });
   };
 
+  async function importCsv(file: File) {
+    setImporting(true);
+    try {
+      const rowsCsv = parseCsv(await file.text());
+      if (rowsCsv.length === 0) {
+        toast.error("No rows found in that CSV");
+        return;
+      }
+      let added = 0;
+      let skipped = 0;
+      for (const r of rowsCsv) {
+        const name = (r["name"] ?? r["product"] ?? "").trim();
+        if (!name) {
+          skipped++;
+          continue;
+        }
+        const storeKey = (r["storeid"] ?? r["store"] ?? "").trim().toLowerCase();
+        const store =
+          stores.find((s) => s.id.toLowerCase() === storeKey) ??
+          stores.find((s) => (s.name ?? "").toLowerCase() === storeKey);
+        const priceRaw = (r["price"] ?? "").replace(/[^0-9.]/g, "");
+        const category = (r["category"] ?? "other").trim().toLowerCase();
+        adminProductService.save({
+          name,
+          brand: (r["brand"] ?? "").trim(),
+          category: CATEGORIES.some((c) => c.id === category) ? category : "other",
+          unit: (r["unit"] ?? "each").trim() || "each",
+          price: priceRaw === "" ? null : Number(priceRaw),
+          storeId: store?.id ?? "",
+          storeName: store?.name ?? "",
+          imageURL: (r["imageurl"] ?? "").trim(),
+        } as any);
+        added++;
+      }
+      toast.success(`Imported ${added} product${added === 1 ? "" : "s"}${skipped ? ` · ${skipped} skipped` : ""}`);
+    } catch {
+      toast.error("Could not read that CSV file");
+    } finally {
+      setImporting(false);
+    }
+  }
+
   return (
     <div className="space-y-3">
+      <SectionCard>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-semibold text-secondary">Bulk import products (CSV)</p>
+            <p className="text-[12px] text-muted-foreground">
+              Header row: name, brand, store, category, unit, price. Store matches a store id or name.
+            </p>
+          </div>
+          <Button size="sm" variant="outline" className="h-9 text-[13px]" disabled={importing} asChild>
+            <label className="cursor-pointer">
+              <Upload size={14} className="mr-1.5" />
+              {importing ? "Importing…" : "Upload CSV"}
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) void importCsv(f);
+                }}
+              />
+            </label>
+          </Button>
+        </div>
+      </SectionCard>
+
       <SectionCard>
         <p className="mb-2.5 text-[13px] font-semibold text-secondary">
           {editing ? "Edit product" : "Add product"}
