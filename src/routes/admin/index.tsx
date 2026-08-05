@@ -1,7 +1,20 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Store as StoreIcon, Package, Tag, Trash2, ShieldAlert, Pencil, X, LogOut, Upload } from "lucide-react";
+import {
+  Plus,
+  Store as StoreIcon,
+  Package,
+  Tag,
+  Trash2,
+  ShieldAlert,
+  Pencil,
+  X,
+  LogOut,
+  Upload,
+  Loader2,
+  Image as ImageIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import { signOut } from "firebase/auth";
 import { Card } from "@/components/ui/card";
@@ -21,6 +34,7 @@ import {
 import { useIsAdmin } from "@/lib/use-admin";
 import { useAuth } from "@/lib/firebase-auth";
 import { getFirebaseAuth } from "@/lib/firebase";
+import { uploadAdminImage } from "@/lib/firebase-storage";
 import {
   adminProductService,
   adminStoreService,
@@ -47,6 +61,99 @@ const inDays = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString(
 
 function SectionCard({ children }: { children: React.ReactNode }) {
   return <Card className="rounded-2xl border-border p-3.5 shadow-[var(--shadow-card)]">{children}</Card>;
+}
+
+/**
+ * Reusable image field: shows a preview, an "Upload image" button (Firebase Storage),
+ * and a plain URL input as a fallback / for pasting an existing link.
+ */
+function ImageUploadField({
+  value,
+  onChange,
+  folder,
+  id,
+}: {
+  value: string;
+  onChange: (url: string) => void;
+  folder: "stores" | "promotions";
+  id?: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file");
+      return;
+    }
+    setUploading(true);
+    try {
+      const url = await uploadAdminImage(file, folder, id);
+      onChange(url);
+      toast.success("Image uploaded");
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload failed — check Storage config/rules");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-3">
+        {value ? (
+          <img
+            src={value}
+            alt=""
+            className="h-14 w-14 shrink-0 rounded-lg border border-border object-cover"
+          />
+        ) : (
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-border text-muted-foreground">
+            <ImageIcon size={18} />
+          </div>
+        )}
+        <div className="flex flex-1 flex-wrap items-center gap-2">
+          <Button size="sm" variant="outline" className="h-8 text-[12px]" disabled={uploading} asChild>
+            <label className="cursor-pointer">
+              {uploading ? (
+                <Loader2 size={13} className="mr-1.5 animate-spin" />
+              ) : (
+                <Upload size={13} className="mr-1.5" />
+              )}
+              {uploading ? "Uploading…" : value ? "Replace image" : "Upload image"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploading}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) void handleFile(f);
+                }}
+              />
+            </label>
+          </Button>
+          {value && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 text-[12px] text-destructive"
+              onClick={() => onChange("")}
+            >
+              <X size={13} className="mr-1.5" /> Remove
+            </Button>
+          )}
+        </div>
+      </div>
+      <Input
+        className="h-8 text-[12px]"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Or paste an image URL…"
+      />
+    </div>
+  );
 }
 
 function AdminPage() {
@@ -187,13 +294,13 @@ function StoresTab() {
               placeholder="CHK"
             />
           </div>
-          <div className="space-y-1">
-            <Label className="text-[12px]">Logo URL</Label>
-            <Input
-              className="h-9 text-[13px]"
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-[12px]">Logo</Label>
+            <ImageUploadField
               value={form.logoURL ?? ""}
-              onChange={(e) => setForm({ ...form, logoURL: e.target.value })}
-              placeholder="https://…"
+              onChange={(url) => setForm({ ...form, logoURL: url })}
+              folder="stores"
+              id={form.id}
             />
           </div>
           <div className="space-y-1">
@@ -225,10 +332,14 @@ function StoresTab() {
           <SectionCard key={s.id}>
             <div className="flex items-center gap-3">
               <div
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[12px] font-bold text-primary-foreground"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[12px] font-bold text-primary-foreground overflow-hidden"
                 style={{ background: s.colour || "var(--primary)" }}
               >
-                {(s.initials || s.name || "?").slice(0, 3).toUpperCase()}
+                {s.logoURL ? (
+                  <img src={s.logoURL} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  (s.initials || s.name || "?").slice(0, 3).toUpperCase()
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[14px] font-semibold text-secondary">{s.name}</p>
@@ -610,13 +721,13 @@ function SpecialsTab() {
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-1">
-            <Label className="text-[12px]">Image URL (advert artwork)</Label>
-            <Input
-              className="h-9 text-[13px]"
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-[12px]">Advert artwork</Label>
+            <ImageUploadField
               value={form.imageURL ?? ""}
-              onChange={(e) => setForm({ ...form, imageURL: e.target.value })}
-              placeholder="https://…"
+              onChange={(url) => setForm({ ...form, imageURL: url })}
+              folder="promotions"
+              id={form.id}
             />
           </div>
           <div className="space-y-1">
@@ -671,6 +782,13 @@ function SpecialsTab() {
         promos.map((p) => (
           <SectionCard key={p.id}>
             <div className="flex items-start gap-3">
+              {p.imageURL && (
+                <img
+                  src={p.imageURL}
+                  alt=""
+                  className="h-12 w-12 shrink-0 rounded-lg border border-border object-cover"
+                />
+              )}
               <div className="min-w-0 flex-1">
                 <span className="inline-flex rounded-full bg-accent px-2 py-0.5 text-[11px] font-semibold text-accent-foreground">
                   {p.tag || "Special"}

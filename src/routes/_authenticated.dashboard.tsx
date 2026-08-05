@@ -170,14 +170,22 @@ function Dashboard() {
 
   const specials = useMemo(() => {
     const live = promos.filter((p) => isPromotionLive(p));
-    return live.map((p) => ({
-      id: p.id,
-      storeId: p.storeId,
-      storeName: p.storeName || "Store",
-      tag: p.tag || "Special",
-      title: p.title,
-    }));
-  }, [promos]);
+    return live.map((p) => {
+      // Pull the matching store so we can show its uploaded logo / brand colour.
+      const store = stores.find((s) => s.id === p.storeId);
+      return {
+        id: p.id,
+        storeId: p.storeId,
+        storeName: p.storeName || store?.name || "Store",
+        tag: p.tag || "Special",
+        title: p.title,
+        imageURL: p.imageURL || "",
+        logoURL: store?.logoURL || "",
+        colour: store?.colour || "",
+        initials: store?.initials || "",
+      };
+    });
+  }, [promos, stores]);
 
   const monthlySpent = useMemo(() => {
     const now = new Date();
@@ -232,7 +240,11 @@ function Dashboard() {
           style={{ scrollbarWidth: "none" }}
         >
           {specials.map((s) => {
-            const style = STORE_STYLE[s.storeId] ?? { bg: "#64748B", text: "#fff", initials: s.storeName.slice(0, 2).toUpperCase() };
+            const style = {
+              bg: s.colour || STORE_STYLE[s.storeId]?.bg || "#64748B",
+              text: STORE_STYLE[s.storeId]?.text || "#fff",
+              initials: s.initials || STORE_STYLE[s.storeId]?.initials || s.storeName.slice(0, 2).toUpperCase(),
+            };
             return (
               <button
                 key={s.id}
@@ -245,7 +257,7 @@ function Dashboard() {
                 className="
                   relative
                   flex
-                  h-[130px]
+                  h-[140px] /* CHANGED: was h-[130px], +10px — revert to h-[130px] if needed */
                   w-full
                   shrink-0
                   snap-start
@@ -273,6 +285,19 @@ function Dashboard() {
 
                   sm:w-[calc(100%-2rem)]
                 "
+                /* ==========================================================
+                   Admin-uploaded advert image is painted as the card
+                   background (cover).
+                   NOTE: the legibility overlay gradient was removed here
+                   (CHANGED — previously a bg-background/90→/70→/25 gradient
+                   sat on top of the image). If text becomes hard to read on
+                   busy images, re-add an overlay <div> after this element.
+                   ========================================================== */
+                style={
+                  s.imageURL
+                    ? { backgroundImage: `url(${s.imageURL})`, backgroundSize: "cover", backgroundPosition: "center" }
+                    : undefined
+                }
               >
                 {/* ==========================================================
                     Decorative background circles
@@ -284,17 +309,21 @@ function Dashboard() {
                 <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-primary/10 opacity-40 blur-3xl" />
 
                 {/* ==========================================================
-                    Store Logo
+                    Store Logo (uploaded image, falls back to initials)
                     ========================================================== */}
 
                 <div
-                  className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-sm font-bold shadow-sm"
+                  className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-bold shadow-sm"
                   style={{
                     backgroundColor: style.bg,
                     color: style.text,
                   }}
                 >
-                  {style.initials}
+                  {s.logoURL ? (
+                    <img src={s.logoURL || "/placeholder.svg"} alt={`${s.storeName} logo`} className="h-full w-full object-cover" />
+                  ) : (
+                    style.initials
+                  )}
                 </div>
 
                 {/* ==========================================================
@@ -331,9 +360,12 @@ function Dashboard() {
 
                 {/* ==========================================================
                     Decorative trolley illustration (SVG, replaces the old emoji)
+                    Hidden when an advert image is set so it doesn't clash.
                     ========================================================== */}
 
-                <TrolleyIllustration className="absolute bottom-3 right-4 h-10 w-10 opacity-80" />
+                {!s.imageURL && (
+                  <TrolleyIllustration className="absolute bottom-3 right-4 h-10 w-10 opacity-80" />
+                )}
 
               </button>
             );
@@ -531,12 +563,16 @@ function Dashboard() {
               >
                 <div
                   className={cn(
-                    "flex h-11 w-11 items-center justify-center rounded-full text-[11px] font-bold transition-all",
+                    "flex h-11 w-11 items-center justify-center overflow-hidden rounded-full text-[11px] font-bold transition-all",
                     selected ? "ring-2 ring-[var(--chip-selected-border)] ring-offset-2 ring-offset-background" : "shadow-sm",
                   )}
                   style={{ backgroundColor: style.bg, color: style.text }}
                 >
-                  {style.initials}
+                  {s.logoURL ? (
+                    <img src={s.logoURL || "/placeholder.svg"} alt={`${s.name} logo`} className="h-full w-full object-cover" />
+                  ) : (
+                    style.initials
+                  )}
                 </div>
                 <span className={cn("max-w-[52px] truncate text-[10px]", selected ? "font-semibold text-[var(--chip-selected-text)]" : "text-muted-foreground")}>
                   {s.name}
