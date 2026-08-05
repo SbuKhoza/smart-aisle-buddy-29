@@ -31,6 +31,7 @@ function ProfilePage() {
     householdSize: profile?.householdSize?.toString() ?? "",
   }));
   const [busy, setBusy] = useState(false);
+  const stores = useStores();
 
   useEffect(() => {
     if (profile) {
