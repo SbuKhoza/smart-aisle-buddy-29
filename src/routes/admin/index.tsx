@@ -85,6 +85,11 @@ function ImageUploadField({
       toast.error("Please choose an image file");
       return;
     }
+    const MAX_BYTES = 12 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      toast.error("Image too large", { description: "Maximum size is 12 MB." });
+      return;
+    }
     setUploading(true);
     try {
       const url = await uploadAdminImage(file, folder, id);
