@@ -421,18 +421,6 @@ function ListDetailPage() {
   );
 }
 
-function Stat({ label, value, strong, danger }: { label: string; value: string; strong?: boolean; danger?: boolean }) {
-  return (
-    <div className="min-w-0">
-      <p className="truncate text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className={[
-        "truncate text-sm font-bold",
-        danger ? "text-destructive" : strong ? "text-primary" : "text-secondary",
-      ].join(" ")}>{value}</p>
-    </div>
-  );
-}
-
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div>
