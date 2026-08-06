@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft, ShoppingCart, MoreHorizontal, Pencil, Copy, Archive, Trash2, Wallet, CheckCircle2, Check, Plus, ChevronUp,
 } from "lucide-react";
@@ -24,6 +24,8 @@ import { ListRow } from "@/components/shopping/ListRow";
 import { EditItemDialog } from "@/components/shopping/EditItemDialog";
 import { ConfirmDialog } from "@/components/shopping/ConfirmDialog";
 import { EmptyState } from "@/components/EmptyState";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useOnline } from "@/lib/offline";
 
 export const Route = createFileRoute("/_authenticated/shopping-lists/$listId")({
   head: () => ({
@@ -60,6 +62,10 @@ function ListDetailPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [planAddOpen, setPlanAddOpen] = useState(true);
   const [statsOpen, setStatsOpen] = useState(false);
+  const [finishPromptOpen, setFinishPromptOpen] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const promptedRef = useRef(false);
+  const online = useOnline();
 
   useEffect(() => {
     if (!user) return;
@@ -90,23 +96,47 @@ function ListDetailPage() {
   const remaining = budget == null ? null : budget - totals.actual;
   const complete = items.length > 0 && totals.purchased === items.length;
 
+  useEffect(() => {
+    if (complete && shopping) {
+      if (!promptedRef.current) {
+        promptedRef.current = true;
+        setFinishPromptOpen(true);
+      }
+    } else {
+      promptedRef.current = false;
+      setFinishPromptOpen(false);
+      setShowSummary(false);
+    }
+  }, [complete, shopping]);
+
   async function addItem(p: QuickAddPayload) {
     if (!user || !listId) return;
-    await shoppingItemService.add(user.uid, listId, {
-      name: p.name,
-      productId: p.productId,
-      category: p.category ?? "other",
-      unit: p.unit ?? "pcs",
-      quantity: 1,
-      estimatedPrice: p.estimatedPrice,
-    });
+    try {
+      await shoppingItemService.add(user.uid, listId, {
+        name: p.name,
+        productId: p.productId,
+        category: p.category ?? "other",
+        unit: p.unit ?? "pcs",
+        quantity: 1,
+        estimatedPrice: p.estimatedPrice,
+      });
+      if (!online) toast("Saved on this device — will sync when you're back online");
+    } catch (e) {
+      console.error(e);
+      toast.error("Couldn't add that product");
+    }
   }
 
   async function setActualPrice(item: ShoppingItem, v: number | null) {
-    await shoppingItemService.update(item.id, {
-      actualPrice: v as any,
-      purchased: v != null,
-    });
+    try {
+      await shoppingItemService.update(item.id, {
+        actualPrice: v as any,
+        purchased: v != null,
+      });
+    } catch (e) {
+      console.error(e);
+      toast.error("Couldn't update that price");
+    }
   }
 
   async function handleRename() {
@@ -167,11 +197,32 @@ function ListDetailPage() {
   }
 
   if (loading || !list) {
-    return <div className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">Loading list…</div>;
+    return (
+      <div className="mx-auto w-full max-w-2xl px-4 pb-40 pt-4 md:px-8 md:pt-8">
+        <div className="mb-3 flex items-center gap-2">
+          <Skeleton className="h-9 w-9 rounded-full" />
+          <div className="flex-1 space-y-1.5">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+          <Skeleton className="h-9 w-9 rounded-full" />
+        </div>
+        <div className="mb-3 flex items-center gap-2">
+          <Skeleton className="h-11 flex-1 rounded-2xl" />
+          <Skeleton className="h-11 w-28 rounded-2xl" />
+          <Skeleton className="h-11 w-11 rounded-2xl" />
+        </div>
+        <div className="space-y-1.5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-14 w-full rounded-2xl" />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 pb-40 pt-4 md:px-8 md:pb-28 md:pt-8">
+    <div className="mx-auto w-full max-w-2xl px-4 pb-28 pt-4 md:px-8 md:pt-8">
       <div className="mb-3 flex items-center gap-1.5">
         <Link to="/shopping-lists" className="-ml-1 rounded-full p-2 text-secondary active:bg-accent"><ArrowLeft size={18} /></Link>
         <div className="min-w-0 flex-1">
@@ -215,21 +266,29 @@ function ListDetailPage() {
         <button
           type="button"
           onClick={() => (shopping ? setAddOpen(true) : setPlanAddOpen((v) => !v))}
-          className="flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card text-[15px] font-medium text-secondary active:bg-accent"
+          aria-label="Add product"
+          className="flex h-11 shrink-0 items-center gap-1.5 rounded-2xl border border-dashed border-border bg-card px-3 text-[14px] font-medium text-secondary active:bg-accent"
         >
-          <Plus size={16} /> Add product
+          <Plus size={16} /> Add
         </button>
         <button
           type="button"
           onClick={() => setStatsOpen(true)}
           aria-label="Show shopping totals"
-          className="flex h-11 shrink-0 items-center gap-2 rounded-2xl border border-border bg-card px-4 active:bg-accent"
+          className="flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-border bg-card px-3 active:bg-accent"
         >
-          <span className="text-[15px] font-bold tabular-nums text-primary">
+          <span className="truncate text-[15px] font-bold tabular-nums text-primary">
             {money(shopping ? totals.actual : totals.estimated)}
           </span>
-          <ChevronUp size={14} className="text-muted-foreground" />
+          <ChevronUp size={14} className="shrink-0 text-muted-foreground" />
         </button>
+        <Button
+          onClick={toggleShopping}
+          variant={shopping ? "outline" : "default"}
+          className="h-11 shrink-0 rounded-2xl px-3.5 text-[14px]"
+        >
+          {shopping ? "Pause" : (<><ShoppingCart size={16} /> Shop</>)}
+        </Button>
       </div>
 
       {!shopping && planAddOpen && (
@@ -259,7 +318,7 @@ function ListDetailPage() {
         </DialogContent>
       </Dialog>
 
-      {complete && (
+      {complete && showSummary && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="mb-3 gap-0 rounded-2xl border-primary/30 bg-primary/5 p-4">
             <div className="mb-3 flex items-center gap-2 text-primary">
@@ -306,14 +365,18 @@ function ListDetailPage() {
         </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-16 z-30 border-t border-border bg-card/95 px-4 py-2.5 backdrop-blur md:bottom-0">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
-          <Stat label="Purchased" value={`${totals.purchased}/${items.length}`} />
-          <Button onClick={toggleShopping} variant={shopping ? "outline" : "default"} size="sm" className="h-9 shrink-0 rounded-full px-4">
-            {shopping ? "Pause" : (<><ShoppingCart size={16} /> Start shopping</>)}
-          </Button>
-        </div>
-      </div>
+      <Dialog open={finishPromptOpen} onOpenChange={setFinishPromptOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader><DialogTitle>All items purchased</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Are you done shopping, or would you like to keep adding products to this list?
+          </p>
+          <DialogFooter className="gap-2 sm:justify-end">
+            <Button variant="ghost" onClick={() => setFinishPromptOpen(false)}>Keep shopping</Button>
+            <Button onClick={() => { setFinishPromptOpen(false); setShowSummary(true); }}>I'm done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <EditItemDialog item={editing} open={!!editing} onOpenChange={(v) => !v && setEditing(null)}
         onSave={async (patch) => { if (editing) await shoppingItemService.update(editing.id, patch); }} />
