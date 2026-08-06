@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft, ShoppingCart, MoreHorizontal, Pencil, Copy, Archive, Trash2, Wallet, CheckCircle2, Check, Plus, X,
+  ArrowLeft, ShoppingCart, MoreHorizontal, Pencil, Copy, Archive, Trash2, Wallet, CheckCircle2, Check, Plus, ChevronUp,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -57,7 +57,9 @@ function ListDetailPage() {
   const [budgetValue, setBudgetValue] = useState("");
   const [deleteListOpen, setDeleteListOpen] = useState(false);
   const [savingTrip, setSavingTrip] = useState(false);
-  const [addOpen, setAddOpen] = useState(true);
+  const [addOpen, setAddOpen] = useState(false);
+  const [planAddOpen, setPlanAddOpen] = useState(true);
+  const [statsOpen, setStatsOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -209,34 +211,53 @@ function ListDetailPage() {
         </DropdownMenu>
       </div>
 
-      {addOpen ? (
-        <Card className="mb-3 gap-0 rounded-2xl border-border p-3 shadow-[var(--shadow-card)]">
-          {shopping && (
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Add while shopping
-              </p>
-              <button
-                type="button"
-                aria-label="Close add product"
-                onClick={() => setAddOpen(false)}
-                className="rounded-full p-1 text-muted-foreground active:bg-accent"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          )}
-          <QuickAddForm userProducts={userProducts} onAdd={addItem} autoFocus={shopping} />
-        </Card>
-      ) : (
+      <div className="mb-3 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => setAddOpen(true)}
-          className="mb-3 flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card text-[15px] font-medium text-secondary active:bg-accent"
+          onClick={() => (shopping ? setAddOpen(true) : setPlanAddOpen((v) => !v))}
+          className="flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card text-[15px] font-medium text-secondary active:bg-accent"
         >
           <Plus size={16} /> Add product
         </button>
+        <button
+          type="button"
+          onClick={() => setStatsOpen(true)}
+          aria-label="Show shopping totals"
+          className="flex h-11 shrink-0 items-center gap-2 rounded-2xl border border-border bg-card px-4 active:bg-accent"
+        >
+          <span className="text-[15px] font-bold tabular-nums text-primary">
+            {money(shopping ? totals.actual : totals.estimated)}
+          </span>
+          <ChevronUp size={14} className="text-muted-foreground" />
+        </button>
+      </div>
+
+      {!shopping && planAddOpen && (
+        <Card className="mb-3 gap-0 rounded-2xl border-border p-3 shadow-[var(--shadow-card)]">
+          <QuickAddForm userProducts={userProducts} onAdd={addItem} />
+        </Card>
       )}
+
+      <Dialog open={shopping && addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>Add while shopping</DialogTitle></DialogHeader>
+          <QuickAddForm userProducts={userProducts} onAdd={addItem} autoFocus />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={statsOpen} onOpenChange={setStatsOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>Totals</DialogTitle></DialogHeader>
+          <dl className="grid grid-cols-2 gap-3 text-sm">
+            <SummaryRow label="Estimated" value={money(totals.estimated)} />
+            <SummaryRow label="Actual" value={money(totals.actual)} />
+            <SummaryRow label="Budget" value={budget == null ? "—" : money(budget)} />
+            <SummaryRow label="Remaining" value={remaining == null ? "—" : money(remaining)} />
+            <SummaryRow label="Difference" value={money(totals.actual - totals.estimated)} />
+            <SummaryRow label="Purchased" value={`${totals.purchased} / ${items.length}`} />
+          </dl>
+        </DialogContent>
+      </Dialog>
 
       {complete && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
@@ -286,14 +307,8 @@ function ListDetailPage() {
       )}
 
       <div className="fixed inset-x-0 bottom-16 z-30 border-t border-border bg-card/95 px-4 py-2.5 backdrop-blur md:bottom-0">
-        <div className="mx-auto flex max-w-2xl items-center gap-3">
-          <div className="grid flex-1 grid-cols-2 gap-x-4 sm:grid-cols-4">
-            <Stat label="Estimated" value={money(totals.estimated)} />
-            <Stat label="Actual" value={money(totals.actual)} strong />
-            <Stat label="Remaining" value={remaining == null ? "—" : money(remaining)}
-              danger={remaining != null && remaining < 0} />
-            <Stat label="Purchased" value={`${totals.purchased}/${items.length}`} />
-          </div>
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
+          <Stat label="Purchased" value={`${totals.purchased}/${items.length}`} />
           <Button onClick={toggleShopping} variant={shopping ? "outline" : "default"} size="sm" className="h-9 shrink-0 rounded-full px-4">
             {shopping ? "Pause" : (<><ShoppingCart size={16} /> Start shopping</>)}
           </Button>
