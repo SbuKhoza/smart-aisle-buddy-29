@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/firebase-auth";
 import { shoppingItemService, shoppingListService } from "@/lib/services/shopping";
 import type { ShoppingItem, ShoppingList } from "@/models";
+import { useOnline, usePendingWrites } from "@/lib/offline";
 
 const cacheKey = (listId: string) => `aislespy:list-cache:${listId}`;
 
@@ -28,6 +29,8 @@ export function useShoppingList(listId: string | undefined) {
   const [list, setList] = useState<ShoppingList | null>(null);
   const [items, setItems] = useState<ShoppingItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const online = useOnline();
+  const pending = usePendingWrites();
 
   // Hydrate last known list + items instantly (offline / pending sync).
   useEffect(() => {
@@ -74,8 +77,18 @@ export function useShoppingList(listId: string | undefined) {
   async function refreshList() {
     if (!listId) return;
     const l = await shoppingListService.get(listId);
-    setList(l);
+    if (l) setList(l);
   }
 
-  return { list, items, loading, refreshList, setList };
+  // When queued writes finish and we're back online, pull fresh server state.
+  useEffect(() => {
+    if (!listId || !online || pending > 0) return;
+    let cancelled = false;
+    shoppingListService.get(listId).then((l) => {
+      if (!cancelled && l) setList(l);
+    });
+    return () => { cancelled = true; };
+  }, [listId, online, pending]);
+
+  return { list, items, loading, refreshList, setList, syncing: pending > 0, online };
 }
