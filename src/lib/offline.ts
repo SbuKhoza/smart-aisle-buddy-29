@@ -2,6 +2,7 @@
 // Firestore already persists writes locally and replays them when the
 // connection returns; these helpers make the UI never *wait* for the server.
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type Listener = () => void;
 
@@ -36,7 +37,12 @@ export function queueWrite<T>(promise: Promise<T>): void {
   emit();
   promise
     .catch((err) => {
-      if (isOnline()) console.error("Write failed", err);
+      if (isOnline()) {
+        console.error("Write failed", err);
+        toast.error("Couldn't save that change", {
+          description: "We'll keep retrying — check your connection.",
+        });
+      }
     })
     .finally(() => {
       pending = Math.max(0, pending - 1);
