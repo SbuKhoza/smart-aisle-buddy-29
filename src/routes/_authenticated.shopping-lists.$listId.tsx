@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowLeft, ShoppingCart, MoreHorizontal, Pencil, Copy, Archive, Trash2, Wallet, CheckCircle2, Check, Plus, ChevronUp,
+  ArrowLeft, ShoppingCart, MoreHorizontal, Pencil, Copy, Archive, Trash2, Wallet, CheckCircle2, Check, Plus, ChevronUp, Share2,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -255,6 +255,7 @@ function ListDetailPage() {
               <Wallet size={14} className="mr-2" /> Set budget
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleDuplicate}><Copy size={14} className="mr-2" /> Duplicate</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleShare}><Share2 size={14} className="mr-2" /> Share list</DropdownMenuItem>
             <DropdownMenuItem
               onClick={async () => {
                 if (list.status === "archived" || list.archived) {
