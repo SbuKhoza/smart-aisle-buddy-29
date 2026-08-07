@@ -18,6 +18,12 @@ import {
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
+  getAdditionalUserInfo,
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
+  updatePassword,
+  deleteUser,
+  EmailAuthProvider,
   type User,
 } from "firebase/auth";
 
@@ -54,7 +60,12 @@ interface AuthContextValue {
     remember: boolean
   ) => Promise<void>;
 
-  loginWithGoogle: () => Promise<void>;
+  loginWithGoogle: (opts?: { allowCreate?: boolean }) => Promise<void>;
+
+  changePassword: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<void>;
 
   logout: () => Promise<void>;
 
@@ -255,6 +266,15 @@ export function AuthProvider({
       lastName
     );
 
+    await setDoc(
+      doc(getDb(), "users", cred.user.uid),
+      {
+        termsAcceptedAt: new Date().toISOString(),
+        termsVersion: "1.0",
+      },
+      { merge: true }
+    );
+
     try {
       await sendEmailVerification(cred.user);
     } catch (e) {
@@ -288,7 +308,7 @@ export function AuthProvider({
     );
   }
 
-  async function loginWithGoogle() {
+  async function loginWithGoogle(opts?: { allowCreate?: boolean }) {
     const auth = getFirebaseAuth();
 
     await setPersistence(
@@ -301,12 +321,65 @@ export function AuthProvider({
       googleProvider
     );
 
+    const isNewUser = getAdditionalUserInfo(cred)?.isNewUser ?? false;
+
+    if (isNewUser && !opts?.allowCreate) {
+      // Login page is for existing users only — undo the accidental signup.
+      try {
+        await deleteUser(cred.user);
+      } catch {
+        await signOut(auth);
+      }
+
+      throw new Error(
+        "No AISLE SPY account found for that Google account. Please create an account first."
+      );
+    }
+
     await ensureUserDoc(cred.user);
+
+    if (isNewUser) {
+      await setDoc(
+        doc(getDb(), "users", cred.user.uid),
+        {
+          termsAcceptedAt: new Date().toISOString(),
+          termsVersion: "1.0",
+        },
+        { merge: true }
+      );
+    }
 
     const p = await loadProfile(cred.user.uid);
 
     setUser(cred.user);
     setProfile(p);
+  }
+
+  async function changePassword(
+    currentPassword: string,
+    newPassword: string
+  ) {
+    const auth = getFirebaseAuth();
+    const current = auth.currentUser;
+
+    if (!current) throw new Error("Not signed in");
+
+    const hasPassword = current.providerData.some(
+      (p) => p.providerId === "password"
+    );
+
+    if (hasPassword) {
+      if (!current.email) throw new Error("No email on this account");
+
+      await reauthenticateWithCredential(
+        current,
+        EmailAuthProvider.credential(current.email, currentPassword)
+      );
+    } else {
+      await reauthenticateWithPopup(current, googleProvider);
+    }
+
+    await updatePassword(current, newPassword);
   }
 
   async function logout() {
@@ -316,7 +389,11 @@ export function AuthProvider({
   async function resetPassword(email: string) {
     await sendPasswordResetEmail(
       getFirebaseAuth(),
-      email
+      email,
+      {
+        url: `${window.location.origin}/auth/reset-password`,
+        handleCodeInApp: false,
+      }
     );
   }
 
@@ -363,6 +440,7 @@ export function AuthProvider({
         register,
         login,
         loginWithGoogle,
+        changePassword,
         logout,
         resetPassword,
         refreshProfile,

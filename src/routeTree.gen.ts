@@ -9,33 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
-import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated.history'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
-import { Route as AuthenticatedShoppingListsRouteImport } from './routes/_authenticated.shopping-lists'
-import { Route as AuthenticatedSpecialsRouteImport } from './routes/_authenticated.specials'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as AdminLoginRouteImport } from './routes/admin/login'
-import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
-import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
-import { Route as AuthenticatedHistoryIndexRouteImport } from './routes/_authenticated.history.index'
-import { Route as AuthenticatedHistoryTripIdRouteImport } from './routes/_authenticated.history.$tripId'
+import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AuthenticatedSpecialsRouteImport } from './routes/_authenticated.specials'
+import { Route as AuthenticatedShoppingListsRouteImport } from './routes/_authenticated.shopping-lists'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated.history'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedShoppingListsIndexRouteImport } from './routes/_authenticated.shopping-lists.index'
+import { Route as AuthenticatedHistoryIndexRouteImport } from './routes/_authenticated.history.index'
 import { Route as AuthenticatedShoppingListsListIdRouteImport } from './routes/_authenticated.shopping-lists.$listId'
+import { Route as AuthenticatedHistoryTripIdRouteImport } from './routes/_authenticated.history.$tripId'
 import { Route as AuthenticatedShoppingListsListIdShopRouteImport } from './routes/_authenticated.shopping-lists.$listId.shop'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -43,24 +41,48 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
-  getParentRoute: () => AuthenticatedRoute,
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRoute,
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/auth/register',
+  path: '/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSpecialsRoute = AuthenticatedSpecialsRouteImport.update({
+  id: '/specials',
+  path: '/specials',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedShoppingListsRoute =
@@ -69,59 +91,49 @@ const AuthenticatedShoppingListsRoute =
     path: '/shopping-lists',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedSpecialsRoute = AuthenticatedSpecialsRouteImport.update({
-  id: '/specials',
-  path: '/specials',
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/auth/forgot-password',
-  path: '/auth/forgot-password',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRegisterRoute = AuthRegisterRouteImport.update({
-  id: '/auth/register',
-  path: '/auth/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedHistoryIndexRoute =
-  AuthenticatedHistoryIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedHistoryRoute,
-  } as any)
-const AuthenticatedHistoryTripIdRoute =
-  AuthenticatedHistoryTripIdRouteImport.update({
-    id: '/$tripId',
-    path: '/$tripId',
-    getParentRoute: () => AuthenticatedHistoryRoute,
-  } as any)
 const AuthenticatedShoppingListsIndexRoute =
   AuthenticatedShoppingListsIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedShoppingListsRoute,
   } as any)
+const AuthenticatedHistoryIndexRoute =
+  AuthenticatedHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedHistoryRoute,
+  } as any)
 const AuthenticatedShoppingListsListIdRoute =
   AuthenticatedShoppingListsListIdRouteImport.update({
     id: '/$listId',
     path: '/$listId',
     getParentRoute: () => AuthenticatedShoppingListsRoute,
+  } as any)
+const AuthenticatedHistoryTripIdRoute =
+  AuthenticatedHistoryTripIdRouteImport.update({
+    id: '/$tripId',
+    path: '/$tripId',
+    getParentRoute: () => AuthenticatedHistoryRoute,
   } as any)
 const AuthenticatedShoppingListsListIdShopRoute =
   AuthenticatedShoppingListsListIdShopRouteImport.update({
@@ -133,6 +145,7 @@ const AuthenticatedShoppingListsListIdShopRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
@@ -143,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin/': typeof AdminIndexRoute
   '/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
   '/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
@@ -153,6 +167,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -161,6 +176,7 @@ export interface FileRoutesByTo {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin': typeof AdminIndexRoute
   '/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
   '/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
@@ -173,6 +189,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -183,6 +200,7 @@ export interface FileRoutesById {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
   '/_authenticated/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
@@ -195,6 +213,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/onboarding'
+    | '/terms'
     | '/dashboard'
     | '/history'
     | '/profile'
@@ -205,6 +224,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
+    | '/auth/reset-password'
     | '/admin/'
     | '/history/$tripId'
     | '/shopping-lists/$listId'
@@ -215,6 +235,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/onboarding'
+    | '/terms'
     | '/dashboard'
     | '/profile'
     | '/settings'
@@ -223,6 +244,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
+    | '/auth/reset-password'
     | '/admin'
     | '/history/$tripId'
     | '/shopping-lists/$listId'
@@ -234,6 +256,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/onboarding'
+    | '/terms'
     | '/_authenticated/dashboard'
     | '/_authenticated/history'
     | '/_authenticated/profile'
@@ -244,6 +267,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
+    | '/auth/reset-password'
     | '/admin/'
     | '/_authenticated/history/$tripId'
     | '/_authenticated/shopping-lists/$listId'
@@ -256,27 +280,22 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
+  TermsRoute: typeof TermsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -286,47 +305,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/history': {
-      id: '/_authenticated/history'
-      path: '/history'
-      fullPath: '/history'
-      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/shopping-lists': {
-      id: '/_authenticated/shopping-lists'
-      path: '/shopping-lists'
-      fullPath: '/shopping-lists'
-      preLoaderRoute: typeof AuthenticatedShoppingListsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/specials': {
-      id: '/_authenticated/specials'
-      path: '/specials'
-      fullPath: '/specials'
-      preLoaderRoute: typeof AuthenticatedSpecialsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
@@ -335,25 +326,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/forgot-password': {
-      id: '/auth/forgot-password'
-      path: '/auth/forgot-password'
-      fullPath: '/auth/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/register': {
@@ -363,19 +340,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/history/': {
-      id: '/_authenticated/history/'
-      path: '/'
-      fullPath: '/history/'
-      preLoaderRoute: typeof AuthenticatedHistoryIndexRouteImport
-      parentRoute: typeof AuthenticatedHistoryRoute
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/history/$tripId': {
-      id: '/_authenticated/history/$tripId'
-      path: '/$tripId'
-      fullPath: '/history/$tripId'
-      preLoaderRoute: typeof AuthenticatedHistoryTripIdRouteImport
-      parentRoute: typeof AuthenticatedHistoryRoute
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/specials': {
+      id: '/_authenticated/specials'
+      path: '/specials'
+      fullPath: '/specials'
+      preLoaderRoute: typeof AuthenticatedSpecialsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/shopping-lists': {
+      id: '/_authenticated/shopping-lists'
+      path: '/shopping-lists'
+      fullPath: '/shopping-lists'
+      preLoaderRoute: typeof AuthenticatedShoppingListsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/shopping-lists/': {
       id: '/_authenticated/shopping-lists/'
@@ -384,12 +410,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShoppingListsIndexRouteImport
       parentRoute: typeof AuthenticatedShoppingListsRoute
     }
+    '/_authenticated/history/': {
+      id: '/_authenticated/history/'
+      path: '/'
+      fullPath: '/history/'
+      preLoaderRoute: typeof AuthenticatedHistoryIndexRouteImport
+      parentRoute: typeof AuthenticatedHistoryRoute
+    }
     '/_authenticated/shopping-lists/$listId': {
       id: '/_authenticated/shopping-lists/$listId'
       path: '/$listId'
       fullPath: '/shopping-lists/$listId'
       preLoaderRoute: typeof AuthenticatedShoppingListsListIdRouteImport
       parentRoute: typeof AuthenticatedShoppingListsRoute
+    }
+    '/_authenticated/history/$tripId': {
+      id: '/_authenticated/history/$tripId'
+      path: '/$tripId'
+      fullPath: '/history/$tripId'
+      preLoaderRoute: typeof AuthenticatedHistoryTripIdRouteImport
+      parentRoute: typeof AuthenticatedHistoryRoute
     }
     '/_authenticated/shopping-lists/$listId/shop': {
       id: '/_authenticated/shopping-lists/$listId/shop'
@@ -472,22 +512,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
+  TermsRoute: TermsRoute,
   AdminLoginRoute: AdminLoginRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

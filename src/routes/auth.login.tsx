@@ -46,7 +46,7 @@ function LoginPage() {
   async function onGoogle() {
     setBusy(true);
     try {
-      await loginWithGoogle();
+      await loginWithGoogle({ allowCreate: false });
       navigate({ to: "/", replace: true });
     } catch (err: any) {
       toast.error(err?.message ?? "Google sign in failed");
@@ -146,6 +146,9 @@ function LoginPage() {
         >
           Continue with Google
         </Button>
+        <p className="mt-2 text-center text-[11px] text-muted-foreground">
+          Existing accounts only — new users must sign up first.
+        </p>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           New here?{" "}

@@ -12,13 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BrandLogo } from "@/components/BrandLogo";
+import { passwordSchema } from "@/lib/password";
+import { PasswordStrength } from "@/components/PasswordStrength";
 
 const schema = z
   .object({
     firstName: z.string().trim().min(1, "Required").max(50),
     lastName: z.string().trim().min(1, "Required").max(50),
     email: z.string().trim().email("Invalid email").max(255),
-    password: z.string().min(8, "At least 8 characters").max(128),
+    password: passwordSchema,
     confirmPassword: z.string(),
     accept: z.literal(true, { errorMap: () => ({ message: "You must accept the terms" }) }),
   })
@@ -44,6 +46,7 @@ function RegisterPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
   const {
     register,
     handleSubmit,
@@ -51,6 +54,25 @@ function RegisterPage() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { accept: false as any } });
+
+  const passwordValue = watch("password") ?? "";
+  const accepted = !!watch("accept");
+
+  async function onGoogle() {
+    if (!accepted) {
+      toast.error("Please accept the Terms of Service to continue");
+      return;
+    }
+    setGoogleBusy(true);
+    try {
+      await loginWithGoogle({ allowCreate: true });
+      navigate({ to: "/onboarding", replace: true });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Google sign up failed");
+    } finally {
+      setGoogleBusy(false);
+    }
+  }
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -102,6 +124,7 @@ function RegisterPage() {
               </button>
             </div>
             {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+            <PasswordStrength value={passwordValue} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="confirmPassword">Confirm password</Label>
@@ -119,7 +142,13 @@ function RegisterPage() {
               onCheckedChange={(v) => setValue("accept", !!v as any, { shouldValidate: true })}
               className="mt-0.5"
             />
-            <span>I accept the Terms of Service and Privacy Policy.</span>
+            <span>
+              I accept the{" "}
+              <Link to="/terms" className="font-medium text-primary hover:underline">
+                Terms of Service and Privacy Policy
+              </Link>
+              .
+            </span>
           </label>
           {errors.accept && <p className="text-xs text-destructive">{errors.accept.message}</p>}
 
@@ -131,8 +160,8 @@ function RegisterPage() {
         <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
           <div className="h-px flex-1 bg-border" />OR<div className="h-px flex-1 bg-border" />
         </div>
-        <Button type="button" variant="outline" onClick={() => loginWithGoogle().then(() => navigate({ to: "/" }))} className="h-12 w-full rounded-xl text-base font-medium">
-          Continue with Google
+        <Button type="button" variant="outline" disabled={googleBusy} onClick={onGoogle} className="h-12 w-full rounded-xl text-base font-medium">
+          {googleBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign up with Google"}
         </Button>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
