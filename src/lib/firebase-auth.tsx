@@ -389,7 +389,11 @@ export function AuthProvider({
   async function resetPassword(email: string) {
     await sendPasswordResetEmail(
       getFirebaseAuth(),
-      email
+      email,
+      {
+        url: `${window.location.origin}/auth/reset-password`,
+        handleCodeInApp: false,
+      }
     );
   }
 
