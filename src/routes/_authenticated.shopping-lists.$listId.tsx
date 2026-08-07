@@ -188,6 +188,44 @@ function ListDetailPage() {
     await shoppingListService.setStatus(list.id, next ? "shopping" : "active");
   }
 
+  async function handleShare() {
+    if (!list) return;
+
+    const lines = items.map((it) => {
+      const price = it.actualPrice ?? it.estimatedPrice;
+      const qty = it.quantity && it.quantity > 1 ? ` x${it.quantity}` : "";
+      const amount = price ? ` — ${money(price * (it.quantity || 1))}` : "";
+      return `${it.purchased ? "☑" : "☐"} ${it.name}${qty}${amount}`;
+    });
+
+    const total = shopping ? totals.actual : totals.estimated;
+    const text = [
+      `AISLE SPY — ${list.name}`,
+      ...lines,
+      "",
+      `Total: ${money(total)}${list.budget ? ` · Budget: ${money(list.budget)}` : ""}`,
+    ].join("\n");
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({ title: list.name, text });
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      toast.success("List copied to clipboard");
+    } catch (err: any) {
+      if (err?.name === "AbortError") return;
+      toast.error("Could not share this list");
+    }
+  }
+
+  async function toggleShoppingLegacy() {
+    if (!list) return;
+    const next = !shopping;
+    setShopping(next);
+    await shoppingListService.setStatus(list.id, next ? "shopping" : "active");
+  }
+
   async function saveTrip() {
     if (!user || !list) return;
     setSavingTrip(true);
