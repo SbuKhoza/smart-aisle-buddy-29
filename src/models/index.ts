@@ -67,6 +67,7 @@ export interface Product {
   storeName?: string;
   unit?: string;
   price?: number | null;
+  quantity?: number;
   createdAt?: ISODate;
 }
 
@@ -91,6 +92,8 @@ export interface ShoppingList {
   name: string;
   storeId?: ID;
   storeName?: string;
+  storeIds?: ID[];
+  storeNames?: string[];
   mode?: "custom" | "store" | "combination";
   createdAt: ISODate;
   updatedAt: ISODate;

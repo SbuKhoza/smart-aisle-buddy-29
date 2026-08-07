@@ -61,6 +61,8 @@ function ShoppingListsPage() {
     const id = await shoppingListService.create(user.uid, input.name, {
       storeId: input.storeId,
       storeName: input.storeName,
+      storeIds: input.storeIds,
+      storeNames: input.storeNames,
       mode: input.mode,
     });
     toast.success("List created");

@@ -31,16 +31,25 @@ export function QuickAddForm({
   userProducts = [],
   onAdd,
   autoFocus,
+  storeIds,
 }: {
   userProducts?: UserProduct[];
   onAdd: (payload: QuickAddPayload) => void | Promise<void>;
   autoFocus?: boolean;
+  /** Restrict catalog suggestions to these stores. Empty/undefined = all stores. */
+  storeIds?: string[];
 }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState(1);
   const nameRef = useRef<HTMLInputElement>(null);
   const catalogProducts = useCatalogProducts();
+
+  const scopedCatalog = useMemo(() => {
+    if (!storeIds || storeIds.length === 0) return catalogProducts;
+    const allowed = new Set(storeIds);
+    return catalogProducts.filter((p) => p.storeId && allowed.has(p.storeId));
+  }, [catalogProducts, storeIds]);
 
   const catalog = useMemo<Suggestion[]>(
     () => [
@@ -51,7 +60,7 @@ export function QuickAddForm({
         unit: p.defaultUnit,
         estimatedPrice: p.estimatedPrice as number | null,
       })),
-      ...catalogProducts.map((p) => ({
+      ...scopedCatalog.map((p) => ({
         id: p.id,
         name: p.name,
         category: p.category ?? "other",
@@ -59,7 +68,7 @@ export function QuickAddForm({
         estimatedPrice: p.price ?? null,
       })),
     ],
-    [userProducts, catalogProducts],
+    [userProducts, scopedCatalog],
   );
 
   const term = name.trim().toLowerCase();

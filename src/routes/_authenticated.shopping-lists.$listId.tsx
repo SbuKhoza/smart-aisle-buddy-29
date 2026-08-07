@@ -67,6 +67,11 @@ function ListDetailPage() {
   const promptedRef = useRef(false);
   const online = useOnline();
 
+  const listStoreIds = useMemo(
+    () => (list?.storeIds?.length ? list.storeIds : list?.storeId ? [list.storeId] : []),
+    [list?.storeIds, list?.storeId],
+  );
+
   useEffect(() => {
     if (!user) return;
     return userProductService.subscribe(user.uid, setUserProducts);
@@ -96,18 +101,23 @@ function ListDetailPage() {
   const remaining = budget == null ? null : budget - totals.actual;
   const complete = items.length > 0 && totals.purchased === items.length;
 
+  // Prompt once per list, and only after the user has had 6s to keep adding items.
   useEffect(() => {
-    if (complete && shopping) {
-      if (!promptedRef.current) {
-        promptedRef.current = true;
-        setFinishPromptOpen(true);
-      }
-    } else {
-      promptedRef.current = false;
-      setFinishPromptOpen(false);
-      setShowSummary(false);
-    }
+    if (!complete || !shopping || promptedRef.current) return;
+    const t = setTimeout(() => {
+      promptedRef.current = true;
+      setFinishPromptOpen(true);
+    }, 6000);
+    return () => clearTimeout(t);
   }, [complete, shopping]);
+
+  async function stopShopping() {
+    if (!list) return;
+    setShopping(false);
+    setFinishPromptOpen(false);
+    setShowSummary(true);
+    await shoppingListService.setStatus(list.id, "active");
+  }
 
   async function addItem(p: QuickAddPayload) {
     if (!user || !listId) return;
@@ -289,18 +299,27 @@ function ListDetailPage() {
         >
           {shopping ? "Pause" : (<><ShoppingCart size={16} /> Shop</>)}
         </Button>
+        {shopping && (
+          <Button
+            onClick={stopShopping}
+            variant="secondary"
+            className="h-11 shrink-0 rounded-2xl px-3.5 text-[14px]"
+          >
+            Stop
+          </Button>
+        )}
       </div>
 
       {!shopping && planAddOpen && (
         <Card className="mb-3 gap-0 rounded-2xl border-border p-3 shadow-[var(--shadow-card)]">
-          <QuickAddForm userProducts={userProducts} onAdd={addItem} />
+          <QuickAddForm userProducts={userProducts} onAdd={addItem} storeIds={listStoreIds} />
         </Card>
       )}
 
       <Dialog open={shopping && addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Add while shopping</DialogTitle></DialogHeader>
-          <QuickAddForm userProducts={userProducts} onAdd={addItem} autoFocus />
+          <QuickAddForm userProducts={userProducts} onAdd={addItem} autoFocus storeIds={listStoreIds} />
         </DialogContent>
       </Dialog>
 
@@ -318,7 +337,7 @@ function ListDetailPage() {
         </DialogContent>
       </Dialog>
 
-      {complete && showSummary && (
+      {showSummary && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="mb-3 gap-0 rounded-2xl border-primary/30 bg-primary/5 p-4">
             <div className="mb-3 flex items-center gap-2 text-primary">
@@ -373,7 +392,7 @@ function ListDetailPage() {
           </p>
           <DialogFooter className="gap-2 sm:justify-end">
             <Button variant="ghost" onClick={() => setFinishPromptOpen(false)}>Keep shopping</Button>
-            <Button onClick={() => { setFinishPromptOpen(false); setShowSummary(true); }}>I'm done</Button>
+            <Button onClick={stopShopping}>I'm done</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

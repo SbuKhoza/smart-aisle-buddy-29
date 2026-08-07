@@ -378,6 +378,7 @@ const emptyProduct = {
   category: "other",
   unit: "each",
   price: "",
+  quantity: "",
   storeId: "",
   imageURL: "",
 };
@@ -434,6 +435,7 @@ function ProductsTab() {
       name: form.name.trim(),
       storeName: store?.name ?? "",
       price: form.price === "" ? null : Number(form.price),
+      quantity: form.quantity === "" ? null : Number(form.quantity),
     });
     toast.success(editing ? "Product updated" : "Product added");
     setForm({ ...emptyProduct, storeId: form.storeId });
@@ -467,6 +469,7 @@ function ProductsTab() {
           category: CATEGORIES.some((c) => c.id === category) ? category : "other",
           unit: (r["unit"] ?? "each").trim() || "each",
           price: priceRaw === "" ? null : Number(priceRaw),
+          quantity: (r["quantity"] ?? "").trim() === "" ? null : Number((r["quantity"] ?? "").replace(/[^0-9.]/g, "")),
           storeId: store?.id ?? "",
           storeName: store?.name ?? "",
           imageURL: (r["imageurl"] ?? "").trim(),
@@ -488,7 +491,7 @@ function ProductsTab() {
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-semibold text-secondary">Bulk import products (CSV)</p>
             <p className="text-[12px] text-muted-foreground">
-              Header row: name, brand, store, category, unit, price. Store matches a store id or name.
+              Header row: name, brand, store, category, unit, price, quantity. Store matches a store id or name.
             </p>
           </div>
           <Button size="sm" variant="outline" className="h-9 text-[13px]" disabled={importing} asChild>
@@ -580,6 +583,16 @@ function ProductsTab() {
               onChange={(e) => setForm({ ...form, price: e.target.value.replace(/[^0-9.]/g, "") })}
             />
           </div>
+          <div className="space-y-1">
+            <Label className="text-[12px]">Quantity</Label>
+            <Input
+              className="h-9 text-[13px]"
+              inputMode="numeric"
+              placeholder="e.g. 24 in stock"
+              value={form.quantity ?? ""}
+              onChange={(e) => setForm({ ...form, quantity: e.target.value.replace(/[^0-9]/g, "") })}
+            />
+          </div>
         </div>
         <div className="mt-3 flex gap-2">
           <Button size="sm" className="h-9 text-[13px]" onClick={save}>
@@ -619,7 +632,9 @@ function ProductsTab() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[14px] font-semibold text-secondary">{p.name}</p>
                 <p className="truncate text-[12px] text-muted-foreground">
-                  {[p.brand, p.storeName, p.unit].filter(Boolean).join(" · ") || "—"}
+                  {[p.brand, p.storeName, p.unit, p.quantity != null ? `Qty ${p.quantity}` : ""]
+                    .filter(Boolean)
+                    .join(" · ") || "—"}
                 </p>
               </div>
               <span className="text-[13px] font-semibold text-secondary">
@@ -629,7 +644,7 @@ function ProductsTab() {
                 size="icon"
                 variant="ghost"
                 className="h-8 w-8"
-                onClick={() => setForm({ ...p, price: p.price ?? "" })}
+                onClick={() => setForm({ ...p, price: p.price ?? "", quantity: p.quantity ?? "" })}
               >
                 <Pencil size={14} />
               </Button>

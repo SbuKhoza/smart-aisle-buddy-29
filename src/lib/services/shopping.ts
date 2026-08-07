@@ -65,6 +65,8 @@ export const shoppingListService = {
       budget?: number;
       storeId?: string;
       storeName?: string;
+      storeIds?: string[];
+      storeNames?: string[];
       mode?: "custom" | "store" | "combination";
     },
   ): Promise<string> {
@@ -81,6 +83,8 @@ export const shoppingListService = {
       budget: opts?.budget ?? null,
       storeId: opts?.storeId ?? null,
       storeName: opts?.storeName ?? null,
+      storeIds: opts?.storeIds ?? (opts?.storeId ? [opts.storeId] : []),
+      storeNames: opts?.storeNames ?? (opts?.storeName ? [opts.storeName] : []),
       mode: opts?.mode ?? "custom",
       createdAt: nowIso(),
       updatedAt: nowIso(),
@@ -130,6 +134,8 @@ export const shoppingListService = {
       budget: src.budget,
       storeId: src.storeId,
       storeName: src.storeName,
+      storeIds: src.storeIds,
+      storeNames: src.storeNames,
       mode: src.mode,
     });
     const items = await shoppingItemService.listOnce(userId, sourceId);
