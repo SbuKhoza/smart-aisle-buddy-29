@@ -219,13 +219,6 @@ function ListDetailPage() {
     }
   }
 
-  async function toggleShoppingLegacy() {
-    if (!list) return;
-    const next = !shopping;
-    setShopping(next);
-    await shoppingListService.setStatus(list.id, next ? "shopping" : "active");
-  }
-
   async function saveTrip() {
     if (!user || !list) return;
     setSavingTrip(true);
