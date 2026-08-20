@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Package } from "lucide-react";
+import { Clock, Package, Receipt } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { ShoppingHistoryEntry } from "@/models";
 import { motion } from "framer-motion";
@@ -26,11 +26,18 @@ export function HistoryCard({ trip, index = 0 }: { trip: ShoppingHistoryEntry; i
                 <p className="mt-0.5 text-xs text-muted-foreground">{fmt(trip.completedAt)}</p>
               </div>
             </div>
-            {overBudget ? (
-              <Badge variant="secondary" className="bg-destructive/10 text-destructive">Over budget</Badge>
-            ) : (
-              <Badge variant="secondary" className="bg-primary/10 text-primary">Completed</Badge>
-            )}
+            <div className="flex flex-col items-end gap-1">
+              {overBudget ? (
+                <Badge variant="secondary" className="bg-destructive/10 text-destructive">Over budget</Badge>
+              ) : (
+                <Badge variant="secondary" className="bg-primary/10 text-primary">Completed</Badge>
+              )}
+              {trip.receiptURL && (
+                <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <Receipt size={11} /> Receipt saved
+                </span>
+              )}
+            </div>
           </div>
           <div className="mt-4 flex items-end justify-between">
             <p className="flex items-center gap-1 text-xs text-muted-foreground">

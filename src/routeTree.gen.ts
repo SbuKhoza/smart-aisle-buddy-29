@@ -27,6 +27,7 @@ import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthenticatedHistoryIndexRouteImport } from './routes/_authenticated.history.index'
 import { Route as AuthenticatedHistoryTripIdRouteImport } from './routes/_authenticated.history.$tripId'
+import { Route as AuthenticatedPromotionsPromoIdRouteImport } from './routes/_authenticated.promotions.$promoId'
 import { Route as AuthenticatedShoppingListsIndexRouteImport } from './routes/_authenticated.shopping-lists.index'
 import { Route as AuthenticatedShoppingListsListIdRouteImport } from './routes/_authenticated.shopping-lists.$listId'
 import { Route as AuthenticatedShoppingListsListIdShopRouteImport } from './routes/_authenticated.shopping-lists.$listId.shop'
@@ -123,6 +124,12 @@ const AuthenticatedHistoryTripIdRoute =
     path: '/$tripId',
     getParentRoute: () => AuthenticatedHistoryRoute,
   } as any)
+const AuthenticatedPromotionsPromoIdRoute =
+  AuthenticatedPromotionsPromoIdRouteImport.update({
+    id: '/promotions/$promoId',
+    path: '/promotions/$promoId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedShoppingListsIndexRoute =
   AuthenticatedShoppingListsIndexRouteImport.update({
     id: '/',
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin/': typeof AdminIndexRoute
   '/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
+  '/promotions/$promoId': typeof AuthenticatedPromotionsPromoIdRoute
   '/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
   '/history/': typeof AuthenticatedHistoryIndexRoute
   '/shopping-lists/': typeof AuthenticatedShoppingListsIndexRoute
@@ -179,6 +187,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin': typeof AdminIndexRoute
   '/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
+  '/promotions/$promoId': typeof AuthenticatedPromotionsPromoIdRoute
   '/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
   '/history': typeof AuthenticatedHistoryIndexRoute
   '/shopping-lists': typeof AuthenticatedShoppingListsIndexRoute
@@ -203,6 +212,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/history/$tripId': typeof AuthenticatedHistoryTripIdRoute
+  '/_authenticated/promotions/$promoId': typeof AuthenticatedPromotionsPromoIdRoute
   '/_authenticated/shopping-lists/$listId': typeof AuthenticatedShoppingListsListIdRouteWithChildren
   '/_authenticated/history/': typeof AuthenticatedHistoryIndexRoute
   '/_authenticated/shopping-lists/': typeof AuthenticatedShoppingListsIndexRoute
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/admin/'
     | '/history/$tripId'
+    | '/promotions/$promoId'
     | '/shopping-lists/$listId'
     | '/history/'
     | '/shopping-lists/'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/admin'
     | '/history/$tripId'
+    | '/promotions/$promoId'
     | '/shopping-lists/$listId'
     | '/history'
     | '/shopping-lists'
@@ -270,6 +282,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/admin/'
     | '/_authenticated/history/$tripId'
+    | '/_authenticated/promotions/$promoId'
     | '/_authenticated/shopping-lists/$listId'
     | '/_authenticated/history/'
     | '/_authenticated/shopping-lists/'
@@ -417,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHistoryTripIdRouteImport
       parentRoute: typeof AuthenticatedHistoryRoute
     }
+    '/_authenticated/promotions/$promoId': {
+      id: '/_authenticated/promotions/$promoId'
+      path: '/promotions/$promoId'
+      fullPath: '/promotions/$promoId'
+      preLoaderRoute: typeof AuthenticatedPromotionsPromoIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/shopping-lists/': {
       id: '/_authenticated/shopping-lists/'
       path: '/'
@@ -493,6 +513,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedShoppingListsRoute: typeof AuthenticatedShoppingListsRouteWithChildren
   AuthenticatedSpecialsRoute: typeof AuthenticatedSpecialsRoute
+  AuthenticatedPromotionsPromoIdRoute: typeof AuthenticatedPromotionsPromoIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -502,6 +523,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedShoppingListsRoute: AuthenticatedShoppingListsRouteWithChildren,
   AuthenticatedSpecialsRoute: AuthenticatedSpecialsRoute,
+  AuthenticatedPromotionsPromoIdRoute: AuthenticatedPromotionsPromoIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

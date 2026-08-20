@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ListChecks, Clock, Wallet, Plus, ShoppingCart, ChevronRight, Leaf, ClipboardList } from "lucide-react";
+import { ListChecks, Clock, Wallet, Plus, ShoppingCart, ChevronRight, Leaf, ClipboardList, Receipt } from "lucide-react";
 import { useAuth } from "@/lib/firebase-auth";
 import { historyService, shoppingListService } from "@/lib/services/shopping";
 import { isPromotionLive, promotionsService } from "@/lib/services/admin";
@@ -251,7 +251,7 @@ function Dashboard() {
               <button
                 key={s.id}
                 type="button"
-                onClick={() => toast.info(`${s.storeName}: ${s.title}`)}
+                onClick={() => navigate({ to: "/promotions/$promoId", params: { promoId: s.id } })}
 
                 /* ==========================================================
                    CHANGE CARD HEIGHT HERE
@@ -619,9 +619,20 @@ function Dashboard() {
               <p className="mt-0.5 text-xs text-muted-foreground">
                 {new Date(lastTrip.completedAt).toLocaleDateString()} · {lastTrip.purchasedCount ?? 0}/{lastTrip.itemCount ?? 0} items
               </p>
-              <p className="mt-1.5 text-xl font-bold text-primary">
-                R {Math.round(lastTrip.actualTotal ?? lastTrip.total ?? 0).toLocaleString()}
-              </p>
+              <div className="mt-1.5 flex items-center gap-2">
+                <p className="text-xl font-bold text-primary">
+                  R {Math.round(lastTrip.actualTotal ?? lastTrip.total ?? 0).toLocaleString()}
+                </p>
+                {lastTrip.receiptURL ? (
+                  <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                    <Receipt size={11} /> Receipt
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    <Receipt size={11} /> Add receipt
+                  </span>
+                )}
+              </div>
             </Link>
           ) : (
             <div className="flex items-center gap-3">

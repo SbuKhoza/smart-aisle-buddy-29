@@ -364,6 +364,13 @@ export const historyService = {
     queueWrite(deleteDoc(doc(getDb(), HISTORY, id)));
   },
 
+  async setReceiptURL(id: string, receiptURL: string) {
+    queueWrite(updateDoc(doc(getDb(), HISTORY, id), {
+      receiptURL,
+      receiptUploadedAt: nowIso(),
+    }));
+  },
+
   async duplicateToList(userId: string, tripId: string): Promise<string> {
     const trip = await this.get(tripId);
     if (!trip) throw new Error("Trip not found");

@@ -96,6 +96,10 @@ export const adminProductService = {
 };
 
 export const promotionsService = {
+  async get(id: string): Promise<Promotion | null> {
+    const snap = await getDoc(doc(getDb(), PROMOTIONS, id));
+    return snap.exists() ? ({ id: snap.id, ...(snap.data() as any) } as Promotion) : null;
+  },
   subscribeAll(cb: (rows: Promotion[]) => void, onError?: (e: Error) => void): Unsubscribe {
     return onSnapshot(
       collection(getDb(), PROMOTIONS),

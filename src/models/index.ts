@@ -182,6 +182,8 @@ export interface ShoppingHistoryEntry {
   itemCount: number;
   completedAt: ISODate;
   items?: ShoppingItem[];
+  receiptURL?: string;
+  receiptUploadedAt?: ISODate;
 }
 
 export interface UserProduct {
